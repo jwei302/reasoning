@@ -1,0 +1,19 @@
+# This repository holds the project page and the poster. The research
+# workspace sits in the same folder locally and stays out of git.
+/*
+!/.gitignore
+!/README.md
+!/docs/
+!/poster/
+
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

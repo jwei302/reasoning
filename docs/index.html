@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deduce the World</title>
+<meta name="description" content="Can a language model form scientific theories from data? We keep the train, validation and test splits of deep learning, replace the learner, and score the theories against tuned models on handwritten digits, tabular prediction and protein binding.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Deduce the World: How Far Can Reasoning Go?">
+<meta property="og:description" content="We replace the learner with a language model that must state an explicit theory, write it as code, and revise it against validation. The theories compete with tuned deep learning and generalize better.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="data.js" defer></script>
+<script src="charts.js" defer></script>
+<script src="site.js" defer></script>
+</head>
+<body>
+<nav class="toc" aria-label="Outline">
+  <p class="toc-title">Outline</p>
+  <ol>
+    <li><a href="#top"><span></span>Overview</a></li>
+    <li><a href="#protocol"><span>1</span>The protocol</a></li>
+    <li><a href="#digits"><span>2</span>Handwritten digits</a></li>
+    <li><a href="#tabular"><span>3</span>Tabular prediction</a></li>
+    <li><a href="#binding"><span>4</span>Protein binding</a></li>
+    <li><a href="#limits"><span>5</span>Where deduction stops</a></li>
+    <li><a href="#citation"><span></span>Citation</a></li>
+    <li><a href="#references"><span></span>References</a></li>
+  </ol>
+</nav>
+<main>
+
+  <header class="masthead" id="top">
+    <h1>Deduce the World:<br>How Far Can Reasoning Go?</h1>
+    <p class="authors"><a href="https://jwei302.github.io">Jeffrey Wei</a><sup>1</sup>, Brian Cheung<sup>2</sup></p>
+    <p class="venue"><sup>1</sup>Yale University &nbsp; <sup>2</sup>UCSF</p>
+    <p class="venue">Research in progress, November 2026</p>
+    <p class="links">[<a href="poster.pdf">Poster</a>]</p>
+  </header>
+
+  <section class="abstract" id="abstract">
+    <h2>Abstract</h2>
+    <p>Scientific progress comes from proposing a theory, testing its predictions, and revising the theory where predictions fail. Deep learning does not work this way. It fits a predictor to existing data, which binds it to that distribution and leaves it unable to extrapolate beyond it. In this work, we ask whether a language model can deduce and abduce scientific theories, and whether those theories predict and generalize better than deep learning. To test this, we keep the train, validation, and test splits of deep learning and replace the learner with a language model. The language model must state an explicit theory of the data, translate the theory into code to make predictions, and revise it with its validation set. We test our framework across domains that differ in how much first-principles theory they already possess. We find that the theories language models form predict competitively with tuned deep learning models, even when given zero data to abduce from, and that they generalize better to conditions held out from training. We find that scaling reasoning effort generally improves the theories a model forms, though the gains are uneven across domains. Finally, we hypothesize that as language model reasoning capabilities improve, we will develop stronger first principles in the theory-poor, data-rich domains where deep learning now dominates.</p>
+  </section>
+
+  <div class="intro">
+    <blockquote class="epigraph">
+      <p>&ldquo;From a drop of water, a logician could infer the possibility of an Atlantic or a Niagara without having seen or heard of one or the other.&rdquo;</p>
+      <footer>Sherlock Holmes, in Arthur Conan Doyle, <cite>A Study in Scarlet</cite> (1887)</footer>
+    </blockquote>
+    <blockquote class="epigraph">
+      <p>&ldquo;Discovery commences with the awareness of anomaly.&rdquo;</p>
+      <footer>Thomas S. Kuhn, <cite>The Structure of Scientific Revolutions</cite> (1962)</footer>
+    </blockquote>
+    <p>Eratosthenes measured the Earth without leaving Egypt. At noon on the summer solstice the sun stood directly over Syene. In Alexandria, to the north, it cast a shadow. The angle of that shadow and the distance between the two cities gave him the circumference of the planet. Enrico Fermi dropped scraps of paper as the blast wave of the Trinity test passed and estimated its yield from how far they drifted. Neither had much data. Both had principles, and they reasoned from them until the world gave up a number.</p>
+    <p>Science alternates between two kinds of inference. We <em>deduce</em> from our current principles as far as they reach. When what we deduce stops matching what we observe, we collect data at the point of failure and reason <em>abductively</em> to a better principle. Then we deduce again. Deep learning is how we now perform the second move at scale, and we reach for it wherever data are plentiful and theory is thin, accepting a model nobody can read in exchange for a prediction.</p>
+    <p>A general-purpose reasoner may change that trade. Reasoning is what lets a person extrapolate from a handful of examples, and if a model can reason well enough to derive a mechanism rather than fit one, it should generalize where a fitted model cannot. This is the capability that matters most for scientific discovery, because the domains we care about are exactly the ones where data are expensive and principles are partial. So we ask four questions.</p>
+    <ol class="research-questions question-list" role="list">
+      <li>Given everything already in the pretraining corpus, how far does reasoning from first principles&nbsp;take&nbsp;us?</li>
+      <li>Can a general-purpose reasoner generalize better than deep learning when data are&nbsp;scarce?</li>
+      <li>Does reasoning keep helping as we scale it, or does it&nbsp;saturate?</li>
+      <li>Which domains still require new&nbsp;measurement?</li>
+    </ol>
+    <p>We test four domains chosen to span the range from strong first-principles theory to almost none, and scale reasoning by the effort setting of two frontier model families.</p>
+    <table class="domains">
+      <thead><tr><th>Domain</th><th>Experiment</th><th>Learned competitor</th></tr></thead>
+      <tbody>
+        <tr><td>Visual<span>Handwritten digits</span></td><td>Classify digits from a reasoned theory, then write every weight of a network by hand, then train from those weights.</td><td>Linear classifier, MLP, convolutional network</td></tr>
+        <tr><td>General<span>Tabular prediction</span></td><td>Ten tasks from six fields, each with fixed splits and a published leaderboard.</td><td>Linear, random forest, XGBoost, CatBoost, MLP</td></tr>
+        <tr><td>Scientific<span>Protein binding</span></td><td>Derive a score for whether two chains bind, from a structure predictor&rsquo;s own error estimates.</td><td>Published score, fitted linear model, fitted MLP</td></tr>
+      </tbody>
+    </table>
+    <p class="tldr"><strong>TLDR:</strong> With no training images at all, a reasoned account classifies most handwritten digits. Networks whose every weight was written by reasoning rival a trained perceptron, and those weights shorten the training that follows. Reasoned programs beat every tuned learned model on small clinical tables and trail boosted trees where the signal lives in interactions. Derived protein binding rules beat the published score and hold on targets never seen, where fitted models collapse.</p>
+  </div>
+
+  <figure class="box" id="hero">
+    <div class="tabs" role="tablist" aria-label="Domains"></div>
+    <p class="tab-desc" id="hero-desc"></p>
+    <svg id="hero-plot" class="plot" role="img" aria-label="One result from the chosen domain"></svg>
+    <figcaption>One result from each domain, plotted against an axis of reasoning. Choose a tab. Every curve is redrawn in its section below with its full setup.</figcaption>
+  </figure>
+
+  <section id="protocol">
+    <h2 class="num">The protocol</h2>
+    <p class="kicker">Keep the splits, change the learner</p>
+    <p>Deep learning fits parameters on a training split, selects on a validation split and reports a test split. We keep all three and change only the learner. The model must reason abductively from the training data to an explicit theory of why the target is predictable, then express that theory as code, which is how a theory gets run and checked. It may measure the data, inspect its errors and revise. The gap between the frozen program and a tuned learned model is how much of the task reasoning reaches.</p>
+    <div class="theorem">
+      <h3>The restriction, in every experiment</h3>
+      <table>
+        <tr><th>May</th><td>Read papers and the web, measure the training data, inspect its own errors, revise its account, and call a language model at run time on the quantities its account names.</td></tr>
+        <tr><th>May not</th><td>Fit parameters to labels, search automatically over rules, store labelled examples, copy weights, or see the test split.</td></tr>
+        <tr><th>Scored</th><td>Once, frozen, on held-out data, against learned models trained on the same rows.</td></tr>
+      </table>
+    </div>
+    <p>We test GPT-6 Astra and Claude Opus 5.5 at five reasoning effort settings, from low to max. A setting name does not imply equal compute across the two families. Each session runs until it is satisfied with its validation score, and keeps a research log of every hypothesis and revision.</p>
+  </section>
+
+  <section id="digits">
+    <h2 class="num">Handwritten digits: theory, weights and initialization</h2>
+    <p class="kicker">Visual</p>
+    <p>Handwritten digits are the oldest benchmark of deep learning (<a href="#ref-mnist">LeCun et al., 1998</a>). A child learns them from a handful of examples. We asked a reasoning model to explain why the images can be classified at all, state that account as a theory, and write a classifier that applies it. The model may not look at the images. It studies them through code and summary statistics. We then took the training images away, first leaving one per digit and then none.<sup class="note-ref"><a href="#note-1" id="note-ref-1" role="doc-noteref">1</a></sup></p>
+
+    <figure class="box" id="fig-digits">
+      <div class="pair two-pair">
+        <svg id="digits-astra" class="plot" role="img" aria-label="Astra held-out digit accuracy against effort for three amounts of data"></svg>
+        <svg id="digits-opus" class="plot" role="img" aria-label="Opus held-out digit accuracy against effort for three amounts of data"></svg>
+      </div>
+      <figcaption>Held-out accuracy of reasoned programs against effort, given fifty thousand labelled training images, one labelled image per digit, or none. With none, the model knows only the array shape, the intensity range and that there are ten classes. Dotted lines are published accuracies of trained models, for scale. Astra was not run at high in these arms.</figcaption>
+    </figure>
+
+    <p>With full data, the reasoned programs pass a trained linear classifier and approach a small trained network. Ten images do almost as well. With no images at all, Opus still classifies most digits correctly from an account of how digits are written. That account came from text. The images add a few points to what the model already knew.</p>
+
+    <h3 class="sub">Programming in weight space</h3>
+    <p>A free-form program can hide a nearest-neighbour search or a bank of hand-drawn templates. We closed that door. The model must choose a standard deep architecture and specify every weight and bias itself. It may write code that fills tensors from formulas it derives. It may evaluate the network, read its errors and revise individual weights. It may not use any optimizer, parameter search, closed-form fit, copied weights or class averages. All computation happens inside the network.</p>
+
+    <div class="theorem">
+      <h3>The instruction, in full</h3>
+      <p>Build a handwritten digit classifier using a standard deep learning architecture. Choose its layers and size, then specify every weight and bias yourself through reasoning. Use multiple hidden layers and standard neural-network operations. Do not fit weights with gradient descent, backpropagation, numerical gradient estimation, another optimiser, automated parameter search, or a closed-form estimator. Do not search for, copy, download or adapt pretrained weights. Do not copy dataset images or class averages into the weights. You may write code that generates weight tensors from explicit formulas and constants you choose. Before each revision, record the change and your reason for choosing those numerical values.</p>
+    </div>
+
+    <figure class="box" id="fig-weights">
+      <svg id="weights" class="plot" role="img" aria-label="Held-out accuracy of networks with written weights against effort"></svg>
+      <figcaption>Held-out accuracy of networks whose every parameter was written by reasoning, against effort. Faint dashed lines are the free-form programs from the same models on the same splits. Dotted lines are published accuracies of trained networks.</figcaption>
+    </figure>
+
+    <p>Opus writes networks that rival a trained multilayer perceptron. Astra starts lower and climbs with every step of effort above medium, gaining nearly ten points from its lowest setting to its highest. The weights are legible. Each neuron has a stated purpose, and its signs and bias follow from that purpose.</p>
+
+    <h3 class="sub">Reasoning as initialization</h3>
+    <p>Written weights are a starting point as well as a classifier. We trained each written network by gradient descent from its written weights, and separately from random weights in the same architecture. Every parameter was trainable. The optimizer, learning-rate search and training budget were fixed before training, and validation chose the checkpoint.<sup class="note-ref"><a href="#note-2" id="note-ref-2" role="doc-noteref">2</a></sup></p>
+
+    <figure class="box" id="fig-init">
+      <div class="pair two-pair">
+        <svg id="init-curves" class="plot" role="img" aria-label="Validation error during training from written weights, by effort"></svg>
+        <svg id="init-cross" class="plot" role="img" aria-label="Updates to reach 98 percent accuracy against effort"></svg>
+      </div>
+      <figcaption>Astra. Left: median validation error during training, starting from the weights written at each effort. Right: updates until validation accuracy first reaches 98%, from written weights and from random weights in the same architecture. Medians over paired seeds, checked once per epoch.</figcaption>
+    </figure>
+
+    <p>For Astra, more reasoning gives a better start, and the start lasts. Networks written at the two highest efforts begin with lower error and stay ahead for the whole run. The highest setting reaches the target within the first epoch. Its random twin needs several times as many updates. Reasoning spent before training buys a cheaper training run.</p>
+
+    <figure class="box" id="fig-powerlaw">
+      <svg id="powerlaw" class="plot" role="img" aria-label="Held-out error after training against effort rank with power-law fits"></svg>
+      <figcaption>Astra. Held-out error after the full training budget against effort rank, both axes logarithmic. Lines are least-squares power-law fits. Ranks encode the order of the settings, not measured compute. Architectures differ across settings, so the random-weight line shows what the architecture alone contributes.</figcaption>
+    </figure>
+
+    <p>Trained error falls with effort roughly as a power law. The exponent from written weights is about twice the exponent from random weights in the same architectures. Part of the gain comes from better architectures and part from the weights themselves. This is a scaling curve for initialization, with reasoning on the horizontal axis. Opus shows no such trend at its present seed count, and its written networks already start close to their trained accuracy.</p>
+
+    <div class="phen">
+      <h3>Reasoning writes useful weights</h3>
+      <p>With no optimizer, reasoning wrote networks that rival a trained perceptron. With an optimizer, those weights shortened training, and for Astra the benefit grew with reasoning effort along a power law. Reasoning spent before training may substitute for part of the compute spent in it.</p>
+    </div>
+  </section>
+
+  <section id="tabular">
+    <h2 class="num">Tabular prediction: the same protocol, ten domains</h2>
+    <p class="kicker">General</p>
+    <p>Digits are one dataset the models know well. Tabular prediction offers many datasets from many fields, each with strong learned baselines, which makes it the fairest general test of the protocol. <a href="#ref-tabarena">TabArena</a> curates such tasks with fixed splits. We chose ten tasks across finance, commerce, economics, chemistry, materials and medicine before any scores existed. Each session received every training row and label the learned baselines saw. It wrote an account of why the target is predictable, then a program that applies it. Fitting coefficients, automated rule search and lookup tables were forbidden. Papers and general knowledge were allowed. Test labels never entered the workspace. We ran three independent sessions per setting.<sup class="note-ref"><a href="#note-3" id="note-ref-3" role="doc-noteref">3</a></sup> The learned references are linear or logistic regression, random forest, XGBoost, CatBoost and an MLP, each tuned on the same training rows.</p>
+
+    <figure class="box" id="fig-tab-ladder">
+      <svg id="tab-ladder" class="plot" role="img" aria-label="Reasoned programs against learned models on ten tabular tasks"></svg>
+      <figcaption>Each row is one task on its own scale, oriented so that right is better. Grey marks are tuned learned models. Coloured bars span the mean score of three sessions at each of the five effort settings, and the large dot marks the best setting. Every method sees the same training rows and is scored on the same held-out rows.</figcaption>
+    </figure>
+
+    <p>The answer depends on the dataset, which is what a general test should reveal. On the two small medical tasks, reasoned programs from both models beat every learned model. Opus also beats them on German credit, a small dataset with a long literature. On tasks governed by many interacting features, such as concrete strength, house prices, coupon acceptance and wine quality, the programs pass or approach the linear model and stay well behind boosted trees. A reasoned rule competes where data are few and the field has written much about the mechanism. It falls behind where the signal lives in interactions nobody has written down.</p>
+
+    <figure class="box" id="fig-tab-task">
+      <div class="tabs fig-tabs wrap" role="tablist" aria-label="Tabular tasks"></div>
+      <p class="tab-desc" id="tab-desc"></p>
+      <svg id="tab-task" class="plot" role="img" aria-label="Test score against effort for the chosen task"></svg>
+      <figcaption>Test score against reasoning effort for one task. Points are means over independent sessions, bars one standard deviation, and faint dots individual programs. Dotted lines are tuned learned models on the same rows.</figcaption>
+    </figure>
+
+    <p>Effort helps on some tasks and not on others. Astra&rsquo;s concrete and housing programs improve steadily with effort. Opus improves on online shopping, churn and used-car prices, then levels off. On German credit, the lowest setting does best. What a reasoned program looks like is easiest to see in one of them.</p>
+
+    <div class="theorem">
+      <h3>A reasoned credit scorecard</h3>
+      <p>Selected rules from one Claude Opus 5.5 program at low effort. Its account treats each factor as evidence about whether an applicant can keep meeting obligations. The point values are judgments stated before measurement, not fitted odds ratios. The session measured the scorecard once and kept it unchanged.</p>
+      <table>
+        <tr><th>Factor</th><th>Points toward good credit</th></tr>
+        <tr><td>Checking account</td><td>None +3. At least 200 DM or salary assigned +1. Negative balance &minus;2.</td></tr>
+        <tr><td>Credit history</td><td>Critical account elsewhere +2. Past delay &minus;1.</td></tr>
+        <tr><td>Loan duration</td><td>&minus;1 for each twelve months beyond the first twelve.</td></tr>
+        <tr><td>Employment</td><td>Under a year &minus;1. Four years or more +1.</td></tr>
+        <tr><td>Age</td><td>&minus;1 below twenty-five.</td></tr>
+        <tr><td>Output</td><td><i>P</i>(good) = 1 / (1 + exp(&minus;(score &minus; 1) / 2))</td></tr>
+      </table>
+    </div>
+
+    <div class="phen">
+      <h3>The dataset decides</h3>
+      <p>Across ten tasks the protocol splits them cleanly. Small tables with a written mechanism go to the reasoned program. Large tables whose signal lies in interactions go to boosted trees. Nothing about the model family changes that boundary, which is why we read it as a property of the domain rather than of the reasoner.</p>
+    </div>
+  </section>
+
+  <section id="binding">
+    <h2 class="num">Protein binding: reasoning about an instrument</h2>
+    <p class="kicker">Scientific</p>
+    <p>The first domains replace a learned model outright. Working scientists more often keep the learned model and ask what its output means. Structure predictors such as <a href="#ref-boltz">Boltz-2</a> return a complex and an estimate of their own error, the predicted aligned error between every pair of residues. Several hand-written scores reduce that matrix to one number for whether two chains bind. One of them, <a href="#ref-ipsae">ipSAE</a>, was derived by a person who worked out why an earlier score failed. It is reasoning applied to a model&rsquo;s output. We asked whether a reasoning model could do the same, and do it better.</p>
+    <p>We use designed binders against five targets with measured binding outcomes and affinities. Each session receives exactly what the published score receives: the error matrix and the assignment of residues to chains. Coordinates, sequences, per-residue confidence and every published score are withheld by what is staged, not by instruction. Splits keep near-identical binders together. The fitted references, a linear regression and an MLP, train on sixty summary features of the same matrix. Claude Opus 5.5 ran at each effort setting.<sup class="note-ref"><a href="#note-4" id="note-ref-4" role="doc-noteref">4</a></sup></p>
+
+    <figure class="box" id="fig-ipsae">
+      <div class="pair three-pair">
+        <svg id="ipsae-0" class="plot" role="img" aria-label="Detecting binders on seen targets"></svg>
+        <svg id="ipsae-1" class="plot" role="img" aria-label="Detecting binders on a held-out target"></svg>
+        <svg id="ipsae-2" class="plot" role="img" aria-label="Ranking affinity on a held-out target"></svg>
+      </div>
+      <figcaption>The published ipSAE score, two fitted models and rules derived by reasoning, on held-out cases. Left: whether a pair binds, on targets the session worked from. Middle: the same question with each target held out in turn. Right: rank correlation with measured affinity on a held-out target. Faint dots are the five effort settings and the large dot is the best of them. Scores are averaged within each target, then across targets.</figcaption>
+    </figure>
+
+    <p>On every question, four or five of the five settings beat the published score. On held-out targets, the derived rules also beat both fitted models. The fitted models do well on targets they were trained on and fall apart on new ones. The derived rules hold. The sessions explain why in their own research logs.</p>
+
+    <div class="theorem">
+      <h3>What reasoning derived</h3>
+      <p><b>Detecting a binder.</b> The published score averages the contacts of its single best residue, so a small docked patch scores like a broad one. Binding free energy grows with interface area, so evidence should add up. With <i>e<sub>ij</sub></i> the predicted error between binder residue <i>i</i> and target residue <i>j</i>, and <i>d</i><sub>0</sub> the published kernel width at its documented floor,</p>
+      <p class="formula"><i>p<sub>ij</sub></i> = 1 / (1 + (<i>e<sub>ij</sub></i> / <i>d</i><sub>0</sub>)<sup>2</sup>), &nbsp;&nbsp; <i>S</i> = &sum;<sub><i>i</i> &isin; binder</sub> max<sub><i>j</i> &isin; target</sub> <i>p<sub>ij</sub></i></p>
+      <p>This is the expected number of binder residues docked onto the target. Summing alone does not help, and narrowing the kernel alone does not help. Only both together do. The count is uncorrelated with binder length.</p>
+      <p><b>Ranking affinity on a new target.</b> A count grows with the binder, and binder size predicts affinity with opposite signs on different targets. The strongest session found this by measurement, abandoned the count, and treated the complex as a harmonic well. With <i>&sigma;</i><sub>iface</sub> the precision of the interface and <i>&sigma;</i><sub>0</sub> the precision the binder achieves within itself,</p>
+      <p class="formula"><i>&kappa;</i> = (<i>&sigma;</i><sub>0</sub> / <i>&sigma;</i><sub>iface</sub>)<sup>2</sup>, &nbsp;&nbsp; p<i>K</i><sub>d</sub> = p<i>K</i><sub>d,ref</sub> + 3 log<sub>10</sub> <i>&kappa;</i></p>
+      <p>The factor of three is half the six rigid-body degrees of freedom that binding confines. The temperature cancels in a ratio of stiffnesses. Nothing is fitted. Using the target instead of the binder as the reference reverses the sign, which the account predicts and the data confirm.</p>
+    </div>
+
+    <h3 class="sub">Physics without a learned model</h3>
+    <p>The error matrix is itself the output of a learned model. Our last test removes it. We took natural complexes with deposited crystal structures and measured binding constants from <a href="#ref-skempi">SKEMPI</a>, grouped by mechanism of association: antibody and antigen, T-cell receptor and peptide-MHC, protease and inhibitor, enzyme and inhibitor, and receptor signalling. Each session worked from four mechanisms and was scored on the fifth.</p>
+
+    <figure class="box" id="fig-skempi">
+      <svg id="skempi" class="plot" role="img" aria-label="Rank correlation with measured affinity on a held-out mechanism against effort"></svg>
+      <figcaption>Rank correlation with measured p<i>K</i><sub>d</sub> on the held-out mechanism, averaged over five folds, against reasoning effort. Dotted lines: buried surface area used directly as a score, and two models fitted on sixty physical features of the same coordinates.</figcaption>
+    </figure>
+
+    <p>The fitted models do worst. They learn one mechanism and fail on the next. A single physical quantity with no parameters, the buried surface area, beats both. The derived rules beat the area, and the best of them improve with effort. Reasoning from physical law transfers across mechanisms better than fitting does.</p>
+
+    <div class="phen">
+      <h3>Derived scores transfer where fitted ones do not</h3>
+      <p>Given exactly the inputs of a published interface score, reasoning derived better ones at nearly every effort setting. On targets and mechanisms never seen, the derived rules hold their ground while fitted models collapse. The rules are short, dimensionally sound, and each constant is named by the argument rather than chosen against the data.</p>
+    </div>
+  </section>
+
+
+  <section id="limits">
+    <h2 class="num">Where deduction stops</h2>
+    <p>Reading across the four domains, the reach of the protocol tracks two properties of a field: how much of its mechanism people have written down, and how much data a learned competitor has.</p>
+    <ol class="conclusions question-list" role="list">
+      <li><strong>Can a reasoned program replace a fitted&nbsp;model?</strong><p>Often, and in more places than we expected. A reasoned account classifies handwritten digits with no training images at all. Reasoned programs beat every tuned learned model on small clinical tables, and derived rules beat a published protein interface score that a person had already reasoned their way to.</p></li>
+      <li><strong>Where does deduction win, and where does fitting&nbsp;win?</strong><p>Deduction wins where the mechanism is written down and the data are few. Fitting wins where the signal lies in interactions nobody has described, which is most large tabular problems. The boundary is a property of the domain, not of the model family: both frontier models we test fall on the same side of it in every task.</p></li>
+      <li><strong>Does more reasoning keep&nbsp;helping?</strong><p>Usually, but never cleanly. The highest settings beat the lowest in most arms we ran, and the best setting sits at the top of the ladder in most of them, yet almost nothing is monotonic. Effort helps weight construction throughout. On tabular tasks it helps on some and not on others, and on one the lowest setting is best.</p></li>
+      <li><strong>Can reasoning hand work to training instead of replacing&nbsp;it?</strong><p>Yes, and this is the result we would most like to pursue. Weights written by reasoning are a usable initialization, and the better the reasoning, the less gradient training the network needs afterwards.</p></li>
+    </ol>
+    <p>That last point is the direction we think is most promising. Everything else here asks whether deduction can take the place of learning. The initialization result asks a better question: what is the exchange rate between the two? Reasoning before training and gradient steps during it are both compute, spent in different currencies, and in one model family the error after training falls with reasoning effort along a power law. If that curve holds up with more seeds and more architectures, it gives a way to budget a training run: spend reasoning until the marginal token buys less than the marginal gradient step. We are now measuring that curve properly, on larger networks and in a second domain, and testing whether written weights survive being scaled up.</p>
+    <p>Every experiment here has limits we have not resolved. These models have read the literature of every domain we test, so recall and derivation are hard to separate. Our held-out splits are small in the protein work, and nothing there is bootstrapped. The initialization result is one model family at a small seed count, and we present it as a direction rather than a measurement. A reasoning effort setting is not a measure of compute, and the same name means different things in different model families. We keep the frozen protocols, programs and logs for every run, and share them on request, so that each claim can be checked.</p>
+  </section>
+
+  <section class="footnotes" id="notes" role="doc-endnotes" aria-labelledby="notes-title">
+    <h2 id="notes-title">Notes</h2>
+    <ol>
+      <li id="note-1">The restriction forbids training a parameterized model, learned features and embeddings, pretrained weights, and per-pixel quantities estimated from the training images. Sessions examine the data only through code and summary statistics, never by viewing an image. <a class="note-back" href="#note-ref-1">&crarr;</a></li>
+      <li id="note-2">The protocol fixed the optimizer, learning-rate search, paired seed ordering and checkpoint selection before training. Forward-equivalence and gradient checks preceded each architecture. Seed counts differ by setting, and Opus has fewer completed pairs than Astra. <a class="note-back" href="#note-ref-2">&crarr;</a></li>
+      <li id="note-3">Sessions may read papers and the web, and may use qualitative prior knowledge of a dataset. Individual test answers and outcome summaries computed over test rows are prohibited. Sessions disclosing exposure to full-dataset outcome tables were excluded by manual review. <a class="note-back" href="#note-ref-3">&crarr;</a></li>
+      <li id="note-4">Each setting had up to three attempts, and the first session to finish was scored. Programs may call a language model at run time on the quantities their account names, never on the matrix itself. Restriction of range deflates every correlation in this cohort, because each case is a curated candidate rather than a random draw. <a class="note-back" href="#note-ref-4">&crarr;</a></li>
+    </ol>
+  </section>
+
+  <section id="citation">
+    <h2>Citation</h2>
+    <div class="cite">
+      <button class="plain-btn" id="copy-bib" type="button">Copy</button>
+<pre id="bibtex">@misc{wei2026deduce,
+  title  = {Deduce the World: How Far Can Reasoning Go?},
+  author = {Wei, Jeffrey and Cheung, Brian},
+  year   = {2026},
+  note   = {https://jwei302.github.io/reasoning}
+}</pre>
+    </div>
+  </section>
+
+  <section id="references">
+    <h2>References</h2>
+    <ul class="refs">
+      <li id="ref-mnist">Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-based learning applied to document recognition. <i>Proceedings of the IEEE</i> 86(11), 2278&ndash;2324 (1998).</li>
+      <li id="ref-tabarena">N. Erickson, L. Purucker, A. Shirkov, et al. TabArena: A Living Benchmark for Machine Learning on Tabular Data. Preprint (2025). <a href="https://arxiv.org/abs/2506.16791">arXiv</a></li>
+      <li id="ref-ipsae">R. L. Dunbrack Jr. ipSAE: Scoring predicted protein-protein interfaces from AlphaFold. Preprint (2025). <a href="https://www.biorxiv.org/content/10.1101/2025.02.10.637595v1">bioRxiv</a></li>
+      <li id="ref-boltz">S. Passaro, G. Corso, J. Wohlwend, et al. Boltz-2: Towards Accurate and Efficient Binding Affinity Prediction. Preprint (2025). <a href="https://www.biorxiv.org/content/10.1101/2025.06.14.659707v1">bioRxiv</a></li>
+      <li id="ref-skempi">J. Jankauskaite, B. Jim&eacute;nez-Garc&iacute;a, J. Dapkunas, et al. SKEMPI 2.0: an updated benchmark of changes in protein-protein binding energy upon mutation. <i>Bioinformatics</i> 35(3), 462&ndash;469 (2019).</li>
+    </ul>
+  </section>
+</main>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged figure"><img alt=""></div>
+</body>
+</html>
