@@ -55,12 +55,11 @@ Results \& figures}
 \colsetup
 \heading{1}{Theories, not fitted predictors}
 
-Science deduces the world from first principles, revising its theories where their predictions fail. Deep learning does not. It fits a predictor to existing data, which binds it to that distribution.
+Science deduces the world from first principles, revising its theories where their predictions fail.
 
 We ask whether a reasoning model can form scientific theories, and whether those theories generalize better than deep learning.
 
-{\centering\includegraphics[width=0.88\linewidth]{poster_framework}\par}
-\figcaption{We keep the splits of deep learning and replace the learner. The model states a theory, writes it as code, and revises it against validation.}
+{\centering\includegraphics[width=\linewidth]{poster_framework}\par}
 
 \vspace{0.10in}
 {\captiontype
@@ -72,10 +71,10 @@ We ask whether a reasoning model can form scientific theories, and whether those
 \vspace{0.30in}
 \heading{2}{How much data a theory needs}
 
-MNIST, the standard handwritten-digit benchmark: 60,000 training and 10,000 test images of the digits 0 to 9.
+MNIST: 60,000 training and 10,000 test images of handwritten digits.
 
-{\centering\includegraphics[width=0.94\linewidth]{poster_digits}\par}
-\figcaption{Best of five reasoning efforts. Dashed lines are trained models on the same split.}
+{\centering\includegraphics[width=\linewidth]{poster_digits}\par}
+\figcaption{Best of five reasoning efforts. Dashed lines are trained models.}
 
 \begin{finding}
 Given no training images at all, a theory of how digits are written classifies most of them.
@@ -83,7 +82,7 @@ Given no training images at all, a theory of how digits are written classifies m
 
 \vspace{0.18in}
 \subhead{Reasoning as initialization}
-A written theory is also a starting point. Networks initialized from written weights reach lower held-out error after the same training budget than networks initialized at random, and the gap widens with reasoning effort: error falls as $r^{-0.46}$ against $r^{-0.21}$.
+A written theory is also a starting point: networks initialized from written weights train to lower error than networks initialized at random, and the gap widens with reasoning effort.
 \end{minipage}};
 
 % ================================================================ column 2
@@ -91,11 +90,11 @@ A written theory is also a starting point. Networks initialized from written wei
 \colsetup
 \heading{3}{The same protocol, ten fields}
 
-Ten tasks from TabArena, a curated benchmark of real tabular prediction problems with fixed splits and tuned baselines.
+Ten tasks from TabArena, a benchmark of real tabular problems with fixed splits and tuned baselines.
 
 \begin{derivation}
 \subhead{What a theory looks like}
-{\captiontype Selected rules from one program on German credit, one of the ten tasks above. The points are judgments stated before measurement, not fitted odds ratios.\par}
+{\captiontype From one program on German credit. The points were stated before measurement, not fitted.\par}
 \vspace{0.14in}
 {\fontsize{31}{40}\selectfont
 \begin{tabular}{@{}p{4.2in}p{8.8in}@{}}
@@ -107,22 +106,22 @@ Output & $P(\text{good}) = 1/(1+e^{-(\text{score}-1)/2})$\\
 \end{derivation}
 
 {\centering\includegraphics[width=0.78\linewidth]{poster_tabular}\par}
-\figcaption{Each task ranks the reasoned theory against five tuned models on the same rows.}
+\figcaption{Each task ranks the theory against five tuned models on the same rows.}
 
 \begin{finding}
-Reasoned theories win on small clinical and credit tables, and trail boosted trees where the signal lies in feature interactions.
+Theories win on small clinical and credit tables, and trail boosted trees where the signal lies in feature interactions.
 \end{finding}
 
 \vspace{0.24in}
 \heading{4}{Deriving a scientific score}
 
-A structure predictor returns a complex and an estimate of its own error. Each session receives that matrix alone.
+Each session receives a structure predictor's error matrix and nothing else.
 
 {\centering\includegraphics[width=0.74\linewidth]{poster_ipsae}\par}
-\figcaption{704 designed binders. The middle and right panels hold out an entire target.}
+\figcaption{704 designed binders. The right two panels hold out a whole target.}
 
 {\centering\includegraphics[width=0.57\linewidth]{poster_skempi_floors}\par}
-\figcaption{One mechanism of association held out whole. Grey bars are fitted on sixty features.}
+\figcaption{One mechanism of association held out whole.}
 
 \begin{finding}
 Every unfitted physical quantity beats both fitted models, and the reasoned rule beats all of them.
@@ -134,14 +133,14 @@ Every unfitted physical quantity beats both fitted models, and the reasoned rule
 \colsetup
 \begin{derivation}
 \subhead{What a theory looks like}
-{\captiontype The chain one session stated before writing any code. Nothing in it is fitted.\par}
+{\captiontype The chain one session stated before writing any code.\par}
 \vspace{0.14in}
 {\fontsize{29}{38}\selectfont
 \begin{tabular}{@{}p{4.0in}p{9.0in}@{}}
-Harmonic well & Equipartition sets the force constant to the thermal energy over the square of the fluctuation. The cross-chain error estimates it.\\[0.10in]
-Stiffness is depth & For a well of fixed shape, curvature at the minimum is proportional to depth. A stiffer interface is a deeper one.\\[0.10in]
-Divide out the predictor & The reported error inflates where the predictor modelled the chain poorly. Measuring it against the binder's own internal error removes that, and the units with it.\\[0.10in]
-Count what binding confines & Association removes six rigid-body degrees of freedom. Each confined quadratic degree contributes half the thermal energy times the log of the stiffness.\\
+Harmonic well & Equipartition sets the force constant to the thermal energy over the square of the fluctuation.\\[0.10in]
+Stiffness is depth & Curvature at the minimum is proportional to depth. A stiffer interface is a deeper one.\\[0.10in]
+Divide out the predictor & Measuring the interface error against the binder's own internal error removes predictor quality, and the units with it.\\[0.10in]
+Count what binding confines & Association removes six rigid-body degrees of freedom, each contributing half the thermal energy times the log of the stiffness.\\
 \end{tabular}\par}
 \vspace{0.10in}
 {\fontsize{33}{42}\selectfont
@@ -149,23 +148,23 @@ Count what binding confines & Association removes six rigid-body degrees of free
 \kappa=\Big(\frac{\sigma_0}{\sigma_{\text{iface}}}\Big)^{2},\qquad
 \mathrm{p}K_\mathrm{d}=\mathrm{p}K_\mathrm{d,ref}+3\log_{10}\kappa .
 \]}
-{\captiontype The three is six halved. The reference affinity is an additive constant, so it cannot touch a rank correlation.\par}
+{\captiontype The three is six halved. Nothing is fitted.\par}
 \end{derivation}
 
 \vspace{0.42in}
 \heading{5}{Scaling reasoning effort}
 
 {\centering\includegraphics[width=\linewidth]{poster_effort}\par}
-\figcaption{Every arm of the project on one axis, each normalized to its own range. The shaded band is the interquartile range across all arms.}
+\figcaption{Every arm on one axis, each normalized to its own range.}
 
 \begin{finding}
-More reasoning makes better theories where theory is what is missing, and makes none where the model already derives the answer at once.
+More reasoning makes better theories, with no gain past the fourth setting.
 \end{finding}
 
 \vspace{0.42in}
 \heading{6}{Hypothesis}
 
-Deep learning dominates the domains that are data-rich and theory-poor. We hypothesize that as reasoning improves, language models will supply the first principles those domains lack, and that stated theories, rather than fitted predictors, will become how we model them.
+Deep learning dominates the domains that are data-rich and theory-poor. We hypothesize that as reasoning improves, language models will supply the first principles those domains lack.
 \end{minipage}};
 
 \end{tikzpicture}
