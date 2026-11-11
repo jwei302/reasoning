@@ -353,9 +353,75 @@ def framework(D):
     fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
 
+
+def effort(D):
+    """Every arm in the project on one axis: does more reasoning make a better theory?"""
+    E = EFFORTS
+    arms = []
+
+    def add(dom, vals, higher):
+        pts = [(i, v) for i, v in enumerate(vals) if v is not None]
+        if len(pts) >= 4:
+            arms.append((dom, pts, higher))
+
+    for reg, fams in D["digits"]["regimes"].items():
+        for f, d in fams.items():
+            add("Digits", [d.get(e) for e in E], True)
+    for x in D["tabular"]:
+        for f in ("Astra", "Opus"):
+            m = {q["effort"]: q["mean"] for q in x["models"].get(f, [])}
+            add("Tabular", [m.get(e) for e in E], x["higher"])
+    for t in D["ipsae"]["tests"]:
+        add("Protein", [t["arms"].get(e) for e in E], True)
+    add("Protein", [D["ipsae"]["skempi"]["arms"].get(e) for e in E], True)
+
+    COL = {"Digits": ASTRA, "Tabular": OPUS, "Protein": PUBLISHED}
+    norm = {k: np.full((0, 5), np.nan) for k in COL}
+    series = {k: [] for k in COL}
+    for dom, pts, hi in arms:
+        idx = np.array([q[0] for q in pts])
+        v = np.array([q[1] for q in pts], float)
+        v = v if hi else -v
+        row = np.full(5, np.nan)
+        row[idx] = (v - v.min()) / (v.max() - v.min())
+        series[dom].append(row)
+
+    fig, ax = plt.subplots(figsize=(14.6, 6.2))
+    x = np.arange(5)
+    allR = np.vstack([np.vstack(v) for v in series.values()])
+    q1 = np.nanpercentile(allR, 25, axis=0)
+    q3 = np.nanpercentile(allR, 75, axis=0)
+    ax.fill_between(x, q1, q3, color="#202A35", alpha=0.08, zorder=1, linewidth=0)
+    ax.plot(x, np.nanmean(allR, axis=0), "-", color="#202A35", linewidth=5.0, zorder=5,
+            label="All 32 arms")
+
+    for dom in ("Digits", "Tabular", "Protein"):
+        R = np.vstack(series[dom])
+        ax.plot(x, np.nanmean(R, axis=0), "-o", color=COL[dom], linewidth=3.0, markersize=12,
+                markeredgecolor="white", markeredgewidth=1.5, zorder=4,
+                label=f"{dom} ({len(series[dom])})")
+
+    ax.set_xticks(x); ax.set_xticklabels(E, fontsize=19)
+    ax.set_xlim(-0.12, 4.12)
+    ax.set_ylim(0.15, 0.88)
+    ax.set_yticks([0.2, 0.4, 0.6, 0.8])
+    ax.set_yticklabels(["worse", "", "", "better"], fontsize=18)
+    ax.set_xlabel("Reasoning effort", labelpad=10)
+    ax.set_ylabel("Score within its own arm", labelpad=10)
+    ax.set_title("More reasoning, better theories")
+    ax.legend(loc="lower right", frameon=True, framealpha=0.96, fontsize=16, ncol=2)
+    ax.grid(True, axis="y", color="#000000", alpha=0.08, linewidth=0.9)
+    ax.set_axisbelow(True)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    fig.tight_layout(pad=0.3)
+    save(fig, "poster_effort")
+
+
 def main():
     D = load()
     framework(D)
+    effort(D)
     ipsae_tests(D)
     skempi(D)
     digits(D)
