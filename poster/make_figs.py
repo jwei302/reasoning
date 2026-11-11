@@ -418,10 +418,75 @@ def effort(D):
     save(fig, "poster_effort")
 
 
+
+def curves(D):
+    """Training from written weights against training from random weights."""
+    C = D["digits"]["curves"]["Astra"]
+    fig, ax = plt.subplots(figsize=(14.0, 5.8))
+    for cond, c, name in [("random", GREY, "from random weights"),
+                          ("authored", ASTRA, "from written weights")]:
+        runs = [np.array(C[cond][e], float) for e in EFFORTS if e in C[cond]]
+        steps = runs[0][:, 0]
+        M = np.vstack([r[:, 1] for r in runs])
+        ax.fill_between(steps, M.min(axis=0), M.max(axis=0), color=c, alpha=0.16,
+                        linewidth=0, zorder=2)
+        ax.plot(steps, np.median(M, axis=0), "-", color=c, linewidth=4.2,
+                label=name, zorder=4)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlim(300, 8600)
+    ax.set_ylim(1.2, 24)
+    ax.set_yticks([1.5, 2, 3, 5, 10, 20]); ax.set_yticklabels(["1.5", "2", "3", "5", "10", "20"])
+    ax.set_xticks([400, 1000, 2000, 4000, 8000])
+    ax.set_xticklabels(["400", "1k", "2k", "4k", "8k"])
+    ax.minorticks_off()
+    ax.set_xlabel("Gradient steps")
+    ax.set_ylabel("Held-out error (%)")
+    ax.set_title("Training from a written theory")
+    ax.legend(loc="upper right", frameon=True, framealpha=0.96, fontsize=17)
+    grid(ax)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    fig.tight_layout(pad=0.3)
+    save(fig, "poster_curves")
+
+
+def skempi_floors(D):
+    """On measured structures, unfitted physics beats everything that was fitted."""
+    S = D["ipsae"]["skempi"]
+    rows = [("Reasoned theory", max(S["arms"].values()), OPUS),
+            ("Buried area", S["floor"]["Buried area, unfitted"], "#4d4d4d"),
+            ("Contact count", S["floor"]["Contact count, unfitted"], "#4d4d4d"),
+            ("Hydrogen bonds", S["floor"]["Hydrogen bonds, unfitted"], "#4d4d4d"),
+            ("Linear regression", S["floor"]["Linear regression, fitted"], "#bdbdbd"),
+            ("MLP", S["floor"]["MLP, fitted"], "#bdbdbd")]
+    rows.sort(key=lambda r: r[1])
+    fig, ax = plt.subplots(figsize=(14.0, 6.0))
+    for i, (name, v, c) in enumerate(rows):
+        ax.barh(i, v, height=0.62, color=c, edgecolor="white", linewidth=1.1, zorder=3)
+        ax.text(v + 0.006, i, f"{v:.3f}", va="center", ha="left", fontsize=18,
+                fontweight="bold", color=c, zorder=4)
+        ax.text(-0.008, i, name, va="center", ha="right", fontsize=19, zorder=4)
+    ax.set_yticks([])
+    ax.set_ylim(-0.7, len(rows) - 0.3)
+    ax.set_xlim(0, 0.49)
+    ax.set_xlabel(r"Spearman $\rho$ with measured p$K_\mathrm{d}$", labelpad=10)
+    ax.set_title("Measured structures, mechanism held out")
+    ax.text(0.47, 0.35, "fitted on\n60 features", ha="right", va="center",
+            fontsize=16, color="#999", linespacing=1.3)
+    ax.grid(True, axis="x", color="#000000", alpha=0.08, linewidth=0.9)
+    ax.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    fig.tight_layout(pad=0.3)
+    save(fig, "poster_skempi_floors")
+
+
 def main():
     D = load()
     framework(D)
     effort(D)
+    curves(D)
+    skempi_floors(D)
     ipsae_tests(D)
     skempi(D)
     digits(D)
