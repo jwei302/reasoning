@@ -481,10 +481,53 @@ def skempi_floors(D):
     save(fig, "poster_skempi_floors")
 
 
+
+def effort_curves(D):
+    """The four cleanest effort curves, each on its own native metric."""
+    E = EFFORTS
+    T = {x["label"]: x for x in D["tabular"]}
+
+    def tab(label, fam):
+        m = {q["effort"]: q["mean"] for q in T[label]["models"][fam]}
+        return [m.get(e) for e in E]
+
+    panels = [
+        ("California housing", "RMSE", tab("California housing", "Astra"), ASTRA, False),
+        ("Concrete strength", "RMSE (MPa)", tab("Concrete strength", "Astra"), ASTRA, False),
+        ("Used Fiat 500", "RMSE (euro)", tab("Used Fiat 500", "Opus"), OPUS, False),
+        ("Written weights, MNIST", "Accuracy (%)",
+         [D["digits"]["regimes"]["weights"]["Astra"].get(e) for e in E], ASTRA, True),
+    ]
+    fig, axes = plt.subplots(1, 4, figsize=(14.6, 5.0))
+    x = np.arange(5)
+    for ax, (title, ylab, v, c, higher) in zip(axes, panels):
+        m = np.array([q is not None for q in v])
+        y = np.array([q if q is not None else np.nan for q in v], float)
+        ax.plot(x[m], y[m], "-o", color=c, linewidth=3.4, markersize=11,
+                markeredgecolor="white", markeredgewidth=1.5, zorder=3)
+        lo, hi = np.nanmin(y), np.nanmax(y)
+        pad = (hi - lo) * 0.22
+        ax.set_ylim(lo - pad, hi + pad)
+        ax.set_xticks(x)
+        ax.set_xticklabels(["low", "", "high", "", "max"], fontsize=16)
+        ax.set_xlim(-0.3, 4.3)
+        ax.set_title(title, fontsize=19, pad=10)
+        ax.set_ylabel(ylab, fontsize=17)
+        ax.tick_params(axis="y", labelsize=15)
+        grid(ax)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+    axes[0].text(0, 1.0, "", transform=axes[0].transAxes)
+    fig.supxlabel("Reasoning effort", fontsize=19, y=0.02)
+    fig.tight_layout(w_pad=2.2, rect=(0, 0.05, 1, 1))
+    save(fig, "poster_effort_curves")
+
+
 def main():
     D = load()
     framework(D)
     effort(D)
+    effort_curves(D)
     curves(D)
     skempi_floors(D)
     ipsae_tests(D)
