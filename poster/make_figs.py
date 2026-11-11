@@ -178,43 +178,55 @@ def cues(D):
 
 
 def digits(D):
-    """Reasoned classifiers with full data, ten images and none, then networks with written weights."""
+    """How much training data the theory needed, and what trained models get."""
     R = D["digits"]["regimes"]
     refs = {r["label"]: r["accuracy"] for r in D["digits"]["references"]}
-    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.6))
-    ax = axes[0]
-    for key, name, ls, m in [("full", "50,000 images", "-", "o"), ("ten", "ten images", (0, (5, 3)), "s"), ("none", "no images", (0, (2, 3)), "^")]:
-        for fam, c in [("Astra", ASTRA), ("Opus", OPUS)]:
-            xs = [i for i, e in enumerate(EFFORTS) if e in R[key][fam]]
-            ys = [R[key][fam][EFFORTS[i]] for i in xs]
-            ax.plot(xs, ys, linestyle=ls, marker=m, color=c, linewidth=2.1,
-                    label=name if fam == "Astra" else None, markeredgecolor="white", markeredgewidth=1.0)
-    ax.set_title("Classifying digits from a written theory")
-    ax.set_ylim(70, 100)
-    ax.legend(loc="lower right", frameon=True, framealpha=0.95, fontsize=15)
-    ax = axes[1]
-    for fam, c, name in [("Astra", ASTRA, "GPT-6 Astra"), ("Opus", OPUS, "Claude Opus 5.5")]:
-        xs = [i for i, e in enumerate(EFFORTS) if e in R["weights"][fam]]
-        ax.plot(xs, [R["weights"][fam][EFFORTS[i]] for i in xs], "-o", color=c, label=name,
-                markeredgecolor="white", markeredgewidth=1.0)
-    ax.set_title("Every weight written by reasoning")
-    ax.set_ylim(78, 100)
-    ax.legend(loc="lower right", frameon=True, framealpha=0.95, fontsize=15)
-    for ax in axes:
-        for label, name in [("linear classifier on pixels", "trained linear classifier"),
-                            ("multilayer perceptron, 300 hidden", "trained MLP"),
-                            ("convolutional network", "trained convolutional net")]:
-            v = refs[label]
-            ax.axhline(v, color="#595959", linestyle=(0, (2, 3)), linewidth=1.2)
-            ax.text(4.35, v - 0.4, name, ha="right", va="top", fontsize=14, color="#595959")
-        ax.set_xticks(range(5)); ax.set_xticklabels(EFFORTS)
-        ax.set_xlim(-0.3, 4.4)
-        ax.set_xlabel("Reasoning effort")
-        ax.set_ylabel("Held-out accuracy (%)")
-        grid(ax)
-    fig.tight_layout(w_pad=2.0)
-    save(fig, "poster_digits")
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 6.2),
+                             gridspec_kw={"width_ratios": [2.15, 1]})
 
+    ax = axes[0]
+    groups = [("full", "50,000\nimages"), ("ten", "ten\nimages"), ("none", "no\nimages")]
+    for j, (fam, c, name) in enumerate([("Astra", ASTRA, "GPT-6 Astra"), ("Opus", OPUS, "Claude Opus 5.5")]):
+        ys = [max(R[k][fam].values()) for k, _ in groups]
+        xs = [i + (j - 0.5) * 0.38 for i in range(len(groups))]
+        ax.bar(xs, ys, width=0.36, color=c, edgecolor="white", linewidth=1.2, label=name, zorder=3)
+        for x, y in zip(xs, ys):
+            ax.text(x, y + 0.7, f"{y:.0f}", ha="center", va="bottom", fontsize=19,
+                    fontweight="bold", color=c, zorder=4)
+    ax.set_xticks(range(len(groups)))
+    ax.set_xticklabels([n for _, n in groups], fontsize=19)
+    ax.set_xlabel("Training images the model was shown", labelpad=10)
+    ax.set_title("Accuracy of a written theory")
+    ax.set_xlim(-0.62, 3.25)
+    ax.legend(loc="lower left", frameon=True, framealpha=0.96, fontsize=16)
+
+    ax = axes[1]
+    ys = [max(R["weights"][f].values()) for f in ("Astra", "Opus")]
+    ax.bar([0, 1], ys, width=0.56, color=[ASTRA, OPUS], edgecolor="white", linewidth=1.2, zorder=3)
+    for x, y, c in zip([0, 1], ys, [ASTRA, OPUS]):
+        ax.text(x, y + 0.7, f"{y:.0f}", ha="center", va="bottom", fontsize=19,
+                fontweight="bold", color=c, zorder=4)
+    ax.set_xticks([0, 1]); ax.set_xticklabels(["Astra", "Opus"], fontsize=19)
+    ax.set_xlabel("No optimizer", labelpad=10)
+    ax.set_title("Every weight written by hand")
+    ax.set_xlim(-0.62, 1.62)
+
+    for ax in axes:
+        for label, name in [("linear classifier on pixels", "trained linear"),
+                            ("multilayer perceptron, 300 hidden", "trained MLP")]:
+            v = refs[label]
+            ax.axhline(v, color="#444", linestyle=(0, (5, 4)), linewidth=1.8, zorder=2)
+            ax.text(ax.get_xlim()[1] - 0.06, v + 0.6, name,
+                    ha="right", va="bottom", fontsize=15, color="#444", zorder=4)
+        ax.set_ylim(60, 103)
+        ax.set_yticks([60, 70, 80, 90, 100])
+        ax.set_ylabel("Held-out accuracy (%)")
+        ax.grid(True, axis="y", color="#000000", alpha=0.08, linewidth=0.9)
+        ax.set_axisbelow(True)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+    fig.tight_layout(w_pad=2.4)
+    save(fig, "poster_digits")
 
 def powerlaw(D):
     """Error after gradient training against the effort that wrote the starting weights."""
@@ -240,65 +252,105 @@ def powerlaw(D):
 
 
 def tabular(D):
-    """Ten tasks, each on its own scale, oriented so that right is better."""
+    """Where the reasoned theory places among the five tuned models, on each task."""
     T = D["tabular"]
-    fig, ax = plt.subplots(figsize=(14.6, 8.0))
-    for i, t in enumerate(T):
-        y = len(T) - 1 - i
-        vals = list(t["learned"].values())
-        means = {f: [q["mean"] for q in t["models"].get(f, [])] for f in ("Astra", "Opus")}
-        vals += means["Astra"] + means["Opus"]
-        lo, hi = min(vals), max(vals)
-        pad = (hi - lo) * 0.08
-        lo, hi = lo - pad, hi + pad
+    rows = []
+    for t in T:
+        means = [q["mean"] for f in ("Astra", "Opus") for q in t["models"].get(f, [])]
+        if not means:
+            continue
+        best = max(means) if t["higher"] else min(means)
+        scored = sorted(list(t["learned"].items()) + [("__ours__", best)],
+                        key=lambda kv: -kv[1] if t["higher"] else kv[1])
+        names = [k for k, _ in scored]
+        rows.append((t["label"], t["domain"], names.index("__ours__") + 1,
+                     "classification" if t["higher"] else "regression"))
+    rows.sort(key=lambda r: (r[2], r[0]))
 
-        def S(v):
-            u = (v - lo) / (hi - lo)
-            return u if t["higher"] else 1 - u
-        if i % 2 == 0:
-            ax.axhspan(y - 0.5, y + 0.5, color="#f6f6f3", zorder=0)
-        ax.plot([0, 1], [y, y], color="#000", alpha=0.18, linewidth=1, zorder=1)
-        for key, m in [("Linear", "|"), ("RandomForest", "s"), ("XGBoost", "^"), ("CatBoost", "D"), ("MLP", "v")]:
-            if key in t["learned"]:
-                ax.plot(S(t["learned"][key]), y, m, color=GREY, markersize=13 if m == "|" else 9,
-                        markeredgewidth=2.4 if m == "|" else 0.8, zorder=2)
-        for f, c, dy in [("Astra", ASTRA, 0.17), ("Opus", OPUS, -0.17)]:
-            if not means[f]:
-                continue
-            xs = [S(v) for v in means[f]]
-            ax.plot([min(xs), max(xs)], [y + dy] * 2, color=c, linewidth=5, alpha=0.45,
-                    solid_capstyle="round", zorder=3)
-            best = max(means[f]) if t["higher"] else min(means[f])
-            ax.plot(S(best), y + dy, "o", color=c, markersize=11, markeredgecolor="white",
-                    markeredgewidth=1.2, zorder=4)
-        ax.text(-0.025, y, t["label"], ha="right", va="center", fontsize=18, fontweight="bold")
-        ax.text(1.025, y, t["domain"], ha="left", va="center", fontsize=15, color="#666")
-    ax.set_xlim(-0.30, 1.22)
-    ax.set_ylim(-0.75, len(T) - 0.25)
+    fig, ax = plt.subplots(figsize=(14.6, 7.8))
+    for i, (label, domain, rank, kind) in enumerate(rows):
+        y = len(rows) - 1 - i
+        ax.plot([1, 6], [y, y], color="#000", alpha=0.13, linewidth=1.6, zorder=1)
+        for r in range(1, 7):
+            if r != rank:
+                ax.plot(r, y, "o", color="#c9c9c9", markersize=13, zorder=2)
+        c = OPUS if rank <= 3 else "#b4654a"
+        ax.plot(rank, y, "o", color=c, markersize=27, markeredgecolor="white",
+                markeredgewidth=2.0, zorder=4)
+        ax.text(rank, y, str(rank), ha="center", va="center", fontsize=16,
+                color="white", fontweight="bold", zorder=5)
+        ax.text(0.72, y, label, ha="right", va="center", fontsize=19)
+        ax.text(6.30, y, f"{domain}, {kind}", ha="left", va="center", fontsize=15, color="#777")
+
+    ax.set_xticks(range(1, 7))
+    ax.set_xticklabels(["1st", "2nd", "3rd", "4th", "5th", "6th"], fontsize=18)
+    ax.set_xlim(0.55, 6.45)
+    ax.set_ylim(-0.75, len(rows) - 0.25)
     ax.set_yticks([])
-    ax.set_xticks([])
-    for side in ("top", "right", "left", "bottom"):
+    ax.set_xlabel("Place of the reasoned theory among the five tuned models", labelpad=12)
+    for side in ("top", "right", "left"):
         ax.spines[side].set_visible(False)
-    ax.text(0, len(T) - 0.45, "worse", ha="left", va="bottom", fontsize=16, color="#666")
-    ax.text(1, len(T) - 0.45, "better →", ha="right", va="bottom", fontsize=16, color="#666")
-    handles = [plt.Line2D([], [], marker="|", color=GREY, linestyle="none", markersize=13, markeredgewidth=2.4, label="linear"),
-               plt.Line2D([], [], marker="s", color=GREY, linestyle="none", label="random forest"),
-               plt.Line2D([], [], marker="^", color=GREY, linestyle="none", label="XGBoost"),
-               plt.Line2D([], [], marker="D", color=GREY, linestyle="none", label="CatBoost"),
-               plt.Line2D([], [], marker="v", color=GREY, linestyle="none", label="MLP"),
-               plt.Line2D([], [], marker="o", color=ASTRA, linewidth=5, alpha=0.6, label="GPT-6 Astra"),
-               plt.Line2D([], [], marker="o", color=OPUS, linewidth=5, alpha=0.6, label="Claude Opus 5.5")]
-    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.45, -0.10), ncol=4,
-              frameon=False, fontsize=15, handletextpad=0.5, columnspacing=1.4)
+    ax.spines["bottom"].set_visible(False)
+    ax.tick_params(axis="x", length=0)
     save(fig, "poster_tabular")
+
+def framework(D):
+    """The two pipelines side by side: same splits, different learner."""
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+    fig, ax = plt.subplots(figsize=(14.6, 6.4))
+    ax.set_xlim(0, 100); ax.set_ylim(0, 44); ax.axis("off")
+
+    def box(x, y, w, h, text, fc, ec, fs=17, tc="#202A35", bold=False):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.0,rounding_size=1.1",
+                                    facecolor=fc, edgecolor=ec, linewidth=1.8, zorder=3))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
+                color=tc, zorder=4, linespacing=1.35,
+                fontweight="bold" if bold else "normal")
+
+    def arrow(x1, y1, x2, y2, c="#536272", rad=0.0):
+        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=26,
+                                     linewidth=2.0, color=c, zorder=2,
+                                     connectionstyle=f"arc3,rad={rad}"))
+
+    # shared split
+    box(1, 17, 13, 10, "Train\nValidation\nTest", "#EDF3F8", "#00356B", 18, bold=True)
+    ax.text(7.5, 29.6, "Identical splits", ha="center", fontsize=16, color="#536272")
+
+    # deep learning track
+    ax.text(18, 40.2, "Deep learning", ha="left", fontsize=20, color="#8c8c8c", fontweight="bold")
+    box(18, 29, 23, 9, "Fit parameters\nto the labels", "#f2f2f2", "#8c8c8c", 17, "#555")
+    box(45, 29, 23, 9, "A predictor\nnobody can read", "#f2f2f2", "#8c8c8c", 17, "#555")
+    arrow(14, 24, 17.3, 33.5, "#8c8c8c", -0.18)
+    arrow(41.3, 33.5, 44.3, 33.5, "#8c8c8c")
+
+    # reasoning track
+    ax.text(1, 12.4, "This work", ha="left", fontsize=20, color="#00356B", fontweight="bold")
+    box(18, 1, 23, 9, "State an explicit\ntheory of the data", "#EDF3F8", "#00356B", 17)
+    box(45, 1, 23, 9, "Write the theory\nas code", "#EDF3F8", "#00356B", 17)
+    arrow(14, 20, 17.3, 5.5, "#00356B", 0.18)
+    arrow(41.3, 5.5, 44.3, 5.5, "#00356B")
+
+    # revision loop
+    ax.add_patch(FancyArrowPatch((58.0, 10.4), (28.0, 10.4), arrowstyle="-|>", mutation_scale=24,
+                                 linewidth=2.2, color="#00356B", zorder=6,
+                                 connectionstyle="arc3,rad=0.34"))
+    ax.text(43, 15.2, "revise where validation predictions fail", ha="center", fontsize=16,
+            color="#00356B", zorder=6)
+
+    # scored once
+    box(74, 15, 24, 14, "Scored once,\nfrozen, on the\nheld-out test set", "white", "#202A35", 18, bold=True)
+    arrow(68.3, 33.5, 80, 29.6, "#8c8c8c", 0.15)
+    arrow(68.3, 5.5, 80, 14.6, "#00356B", -0.15)
+
+    fig.tight_layout(pad=0.2)
+    save(fig, "poster_framework")
 
 
 def main():
     D = load()
+    framework(D)
     ipsae_tests(D)
     skempi(D)
-    statement(D)
-    cues(D)
     digits(D)
     powerlaw(D)
     tabular(D)
