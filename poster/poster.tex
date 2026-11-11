@@ -19,7 +19,7 @@
 \definecolor{rulegray}{HTML}{D3DEE7}
 \newcommand{\bodytype}{\fontsize{39}{50}\selectfont}
 \newcommand{\captiontype}{\fontsize{28}{36}\selectfont}
-\newcommand{\colsetup}{\bodytype\raggedright\setlength{\parindent}{0pt}\setlength{\parskip}{0.26in}\setlength{\abovedisplayskip}{0.16in}\setlength{\belowdisplayskip}{0.16in}}
+\newcommand{\colsetup}{\bodytype\raggedright\setlength{\parindent}{0pt}\setlength{\parskip}{0.24in}\setlength{\abovedisplayskip}{0.16in}\setlength{\belowdisplayskip}{0.16in}}
 \newcommand{\heading}[2]{{\fontsize{46}{56}\selectfont\bfseries\color{yale}#1\quad #2\par}\vspace{0.16in}}
 \newcommand{\subhead}[1]{{\fontsize{36}{45}\selectfont\bfseries\color{yale}#1\par}\vspace{0.06in}}
 \newcommand{\figcaption}[1]{{\captiontype\color{muted}#1\par}}
@@ -51,7 +51,7 @@ Results \& figures}
 \end{minipage}};
 
 % ================================================================ column 1
-\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-5.9in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
 \heading{1}{Theories, not fitted predictors}
 
@@ -59,7 +59,7 @@ Science deduces the world from first principles, revising its theories where the
 
 We ask whether a reasoning model can form scientific theories, and whether those theories generalize better than deep learning.
 
-{\centering\includegraphics[width=\linewidth]{poster_framework}\par}
+{\centering\includegraphics[width=0.94\linewidth]{poster_framework}\par}
 \figcaption{We keep the splits of deep learning and replace the learner. The model states a theory, writes it as code, and revises it against validation.}
 
 \vspace{0.10in}
@@ -80,30 +80,19 @@ MNIST, the standard handwritten-digit benchmark: 60,000 training and 10,000 test
 \begin{finding}
 Given no training images at all, a theory of how digits are written classifies most of them.
 \end{finding}
+
+\vspace{0.18in}
+\subhead{Reasoning as initialization}
+A written theory is also a starting point. Networks initialized from written weights reach lower held-out error after the same training budget than networks initialized at random, and the gap widens with reasoning effort: error falls as $r^{-0.46}$ against $r^{-0.21}$.
 \end{minipage}};
 
 % ================================================================ column 2
-\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-5.9in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
-\subhead{Reasoning as initialization}
-A written theory is also a starting point. Training from written weights converges sooner, and by more as reasoning grows.
-
-{\centering\includegraphics[width=0.90\linewidth]{poster_powerlaw}\par}
-\figcaption{Held-out error after a fixed training budget against effort rank, both axes logarithmic.}
-
-\vspace{0.30in}
 \heading{3}{The same protocol, ten fields}
 
 Ten tasks from TabArena, a curated benchmark of real tabular prediction problems with fixed splits and tuned baselines.
 
-{\centering\includegraphics[width=0.96\linewidth]{poster_tabular}\par}
-\figcaption{Each task ranks the reasoned theory against five tuned models on the same rows.}
-
-\begin{finding}
-Reasoned theories win on small clinical and credit tables, and trail boosted trees where the signal lies in feature interactions.
-\end{finding}
-
-\vspace{0.20in}
 \begin{derivation}
 \subhead{What a theory looks like}
 {\captiontype Selected rules from one program on German credit, one of the ten tasks above. The points are judgments stated before measurement, not fitted odds ratios.\par}
@@ -117,16 +106,20 @@ Employment & under a year $-1$, four years or more $+1$\\[0.10in]
 Output & $P(\text{good}) = 1/(1+e^{-(\text{score}-1)/2})$\\
 \end{tabular}\par}
 \end{derivation}
-\end{minipage}};
 
-% ================================================================ column 3
-\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.9in]current page.north west) {\begin{minipage}{14.6in}
-\colsetup
+{\centering\includegraphics[width=0.96\linewidth]{poster_tabular}\par}
+\figcaption{Each task ranks the reasoned theory against five tuned models on the same rows.}
+
+\begin{finding}
+Reasoned theories win on small clinical and credit tables, and trail boosted trees where the signal lies in feature interactions.
+\end{finding}
+
+\vspace{0.24in}
 \heading{4}{Deriving a scientific score}
 
 A structure predictor returns a complex and an estimate of its own error. Each session receives that matrix alone.
 
-{\centering\includegraphics[width=0.86\linewidth]{poster_ipsae}\par}
+{\centering\includegraphics[width=0.96\linewidth]{poster_ipsae}\par}
 \figcaption{704 designed binders. The middle and right panels hold out an entire target.}
 
 \begin{derivation}
@@ -139,30 +132,33 @@ Treating the bound complex as a harmonic well, with $\sigma_{\text{iface}}$ the 
 \]}
 The 3 is half the six rigid-body degrees of freedom that association confines. Nothing is fitted.
 \end{derivation}
-
-\begin{finding}
-A rule derived from physics beats the published score on a target it has never seen.
-\end{finding}
-
-\vspace{0.30in}
-\heading{5}{Scaling reasoning effort}
-
-Every arm of the project on one axis, each normalized to its own range.
-
-{\centering\includegraphics[width=\linewidth]{poster_effort}\par}
-\figcaption{Shaded band is the interquartile range across all arms.}
-
-\begin{finding}
-More reasoning makes better theories where theory is what is missing, and makes none where the model already derives the answer at the first attempt.
-\end{finding}
 \end{minipage}};
 
-% ---------------------------------------------------------------- hypothesis
-\node[anchor=south,inner sep=0pt] at ([yshift=1.3in]current page.south) {\begin{minipage}{46.2in}
-\begin{finding}[fontupper=\fontsize{40}{52}\selectfont,halign=left,top=0.26in,bottom=0.26in,left=0.42in]
-{\fontsize{46}{56}\selectfont\bfseries\color{yale}6\quad Hypothesis\par}\vspace{0.16in}
-Deep learning dominates the domains that are data-rich and theory-poor, which are exactly the domains where no one has yet written down the first principles. We hypothesize that as reasoning improves, language models will supply those first principles, and that the theories they state, rather than the predictors we fit, will become how we model these domains.
+% ================================================================ column 3
+\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
+\colsetup
+
+{\centering\includegraphics[width=\linewidth]{poster_skempi_floors}\par}
+\figcaption{Measured structures, one mechanism of association held out whole. Grey bars are fitted on sixty features of the same structures.}
+
+\begin{finding}
+A rule derived from physics beats the published score on a target it has never seen. Every unfitted physical quantity beats both fitted models.
 \end{finding}
+
+\vspace{0.42in}
+\heading{5}{Scaling reasoning effort}
+
+{\centering\includegraphics[width=\linewidth]{poster_effort}\par}
+\figcaption{Every arm of the project on one axis, each normalized to its own range. The shaded band is the interquartile range across all arms.}
+
+\begin{finding}
+More reasoning makes better theories where theory is what is missing, and makes none where the model already derives the answer at once.
+\end{finding}
+
+\vspace{0.42in}
+\heading{6}{Hypothesis}
+
+Deep learning dominates the domains that are data-rich and theory-poor. We hypothesize that as reasoning improves, language models will supply the first principles those domains lack, and that stated theories, rather than fitted predictors, will become how we model them.
 \end{minipage}};
 
 \end{tikzpicture}
