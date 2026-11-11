@@ -295,56 +295,63 @@ def tabular(D):
     save(fig, "poster_tabular")
 
 def framework(D):
-    """The two pipelines side by side: same splits, different learner."""
+    """Two lanes, identical splits, one frozen score. Orthogonal routing, nothing crosses."""
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
-    fig, ax = plt.subplots(figsize=(14.6, 6.4))
-    ax.set_xlim(0, 100); ax.set_ylim(0, 44); ax.axis("off")
+    from matplotlib.path import Path as MPath
+    from matplotlib.patches import PathPatch
 
-    def box(x, y, w, h, text, fc, ec, fs=17, tc="#202A35", bold=False):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.0,rounding_size=1.1",
-                                    facecolor=fc, edgecolor=ec, linewidth=1.8, zorder=3))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
-                color=tc, zorder=4, linespacing=1.35,
+    YALE, GREY = "#00356B", "#9a9a9a"
+    fig, ax = plt.subplots(figsize=(14.6, 6.0))
+    ax.set_xlim(0, 100); ax.set_ylim(-2, 48); ax.axis("off")
+
+    def box(x0, x1, y0, y1, lines, fc, ec, tc, fs=17, bold=False):
+        ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0,
+                                    boxstyle="round,pad=0,rounding_size=1.4",
+                                    facecolor=fc, edgecolor=ec, linewidth=2.0, zorder=3))
+        ax.text((x0 + x1) / 2, (y0 + y1) / 2, lines, ha="center", va="center",
+                fontsize=fs, color=tc, zorder=4, linespacing=1.45,
                 fontweight="bold" if bold else "normal")
 
-    def arrow(x1, y1, x2, y2, c="#536272", rad=0.0):
-        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=26,
-                                     linewidth=2.0, color=c, zorder=2,
-                                     connectionstyle=f"arc3,rad={rad}"))
+    def elbow(pts, c):
+        """Orthogonal polyline with a single arrowhead at the end."""
+        verts = list(pts)
+        ax.add_patch(PathPatch(MPath(verts, [MPath.MOVETO] + [MPath.LINETO] * (len(verts) - 1)),
+                               facecolor="none", edgecolor=c, linewidth=2.2,
+                               joinstyle="round", capstyle="round", zorder=2))
+        ax.add_patch(FancyArrowPatch(verts[-2], verts[-1], arrowstyle="-|>",
+                                     mutation_scale=24, linewidth=0, color=c, zorder=2))
 
-    # shared split
-    box(1, 17, 13, 10, "Train\nValidation\nTest", "#EDF3F8", "#00356B", 18, bold=True)
-    ax.text(7.5, 29.6, "Identical splits", ha="center", fontsize=16, color="#536272")
+    # ---- shared splits
+    box(2, 17, 16, 30, "Train\nValidation\nTest", "#EDF3F8", YALE, YALE, 18, bold=True)
+    ax.text(9.5, 31.4, "Identical splits", ha="center", fontsize=16, color="#536272")
 
-    # deep learning track
-    ax.text(18, 40.2, "Deep learning", ha="left", fontsize=20, color="#8c8c8c", fontweight="bold")
-    box(18, 29, 23, 9, "Fit parameters\nto the labels", "#f2f2f2", "#8c8c8c", 17, "#555")
-    box(45, 29, 23, 9, "A predictor\nnobody can read", "#f2f2f2", "#8c8c8c", 17, "#555")
-    arrow(14, 24, 17.3, 33.5, "#8c8c8c", -0.18)
-    arrow(41.3, 33.5, 44.3, 33.5, "#8c8c8c")
+    # ---- deep learning lane
+    ax.text(25, 44.6, "Deep learning", ha="left", fontsize=19, color=GREY, fontweight="bold")
+    box(25, 47, 33, 43, "Fit parameters\nto the labels", "#f4f4f4", GREY, "#555")
+    box(52, 74, 33, 43, "A predictor\nnobody can read", "#f4f4f4", GREY, "#555")
+    elbow([(17, 23), (21, 23), (21, 38), (24.4, 38)], GREY)
+    elbow([(47, 38), (51.4, 38)], GREY)
 
-    # reasoning track
-    ax.text(1, 12.4, "This work", ha="left", fontsize=20, color="#00356B", fontweight="bold")
-    box(18, 1, 23, 9, "State an explicit\ntheory of the data", "#EDF3F8", "#00356B", 17)
-    box(45, 1, 23, 9, "Write the theory\nas code", "#EDF3F8", "#00356B", 17)
-    arrow(14, 20, 17.3, 5.5, "#00356B", 0.18)
-    arrow(41.3, 5.5, 44.3, 5.5, "#00356B")
+    # ---- reasoning lane
+    ax.text(25, 13.2, "This work", ha="left", fontsize=19, color=YALE, fontweight="bold")
+    box(25, 47, 1, 11, "State an explicit\ntheory of the data", "#EDF3F8", YALE, YALE)
+    box(52, 74, 1, 11, "Write the theory\nas code", "#EDF3F8", YALE, YALE)
+    elbow([(17, 23), (21, 23), (21, 6), (24.4, 6)], YALE)
+    elbow([(47, 6), (51.4, 6)], YALE)
 
-    # revision loop
-    ax.add_patch(FancyArrowPatch((58.0, 10.4), (28.0, 10.4), arrowstyle="-|>", mutation_scale=24,
-                                 linewidth=2.2, color="#00356B", zorder=6,
-                                 connectionstyle="arc3,rad=0.34"))
-    ax.text(43, 15.2, "revise where validation predictions fail", ha="center", fontsize=16,
-            color="#00356B", zorder=6)
+    # ---- revision loop, routed in the clear band between the lanes
+    elbow([(63, 11), (63, 17), (41, 17), (41, 12.6)], YALE)
+    ax.text(52, 18.4, "revise where validation predictions fail",
+            ha="center", fontsize=16, color=YALE)
 
-    # scored once
-    box(74, 15, 24, 14, "Scored once,\nfrozen, on the\nheld-out test set", "white", "#202A35", 18, bold=True)
-    arrow(68.3, 33.5, 80, 29.6, "#8c8c8c", 0.15)
-    arrow(68.3, 5.5, 80, 14.6, "#00356B", -0.15)
+    # ---- one frozen score
+    box(81, 98, 16, 30, "Scored once,\nfrozen, on the\nheld-out test set", "white", "#202A35",
+        "#202A35", 18, bold=True)
+    elbow([(74, 38), (77.5, 38), (77.5, 23), (80.4, 23)], GREY)
+    elbow([(74, 6), (77.5, 6), (77.5, 23), (80.4, 23)], YALE)
 
-    fig.tight_layout(pad=0.2)
+    fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
-
 
 def main():
     D = load()
