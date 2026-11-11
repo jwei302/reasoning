@@ -51,7 +51,7 @@ Results \& figures}
 \end{minipage}};
 
 % ================================================================ column 1
-\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-5.35in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
 \heading{1}{Theories, not fitted predictors}
 
@@ -87,7 +87,7 @@ A written theory is also a starting point. Networks initialized from written wei
 \end{minipage}};
 
 % ================================================================ column 2
-\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-5.35in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
 \heading{3}{The same protocol, ten fields}
 
@@ -101,13 +101,12 @@ Ten tasks from TabArena, a curated benchmark of real tabular prediction problems
 \begin{tabular}{@{}p{4.2in}p{8.8in}@{}}
 Checking account & none $+3$, at least 200 DM $+1$, negative $-2$\\[0.06in]
 Credit history & critical account elsewhere $+2$, past delay $-1$\\[0.06in]
-Loan duration & $-1$ for each twelve months beyond the first twelve\\[0.06in]
-Employment & under a year $-1$, four years or more $+1$\\[0.10in]
+Loan duration & $-1$ for each twelve months beyond the first twelve\\[0.10in]
 Output & $P(\text{good}) = 1/(1+e^{-(\text{score}-1)/2})$\\
 \end{tabular}\par}
 \end{derivation}
 
-{\centering\includegraphics[width=0.96\linewidth]{poster_tabular}\par}
+{\centering\includegraphics[width=0.88\linewidth]{poster_tabular}\par}
 \figcaption{Each task ranks the reasoned theory against five tuned models on the same rows.}
 
 \begin{finding}
@@ -119,31 +118,39 @@ Reasoned theories win on small clinical and credit tables, and trail boosted tre
 
 A structure predictor returns a complex and an estimate of its own error. Each session receives that matrix alone.
 
-{\centering\includegraphics[width=0.96\linewidth]{poster_ipsae}\par}
+{\centering\includegraphics[width=0.80\linewidth]{poster_ipsae}\par}
 \figcaption{704 designed binders. The middle and right panels hold out an entire target.}
 
+{\centering\includegraphics[width=0.66\linewidth]{poster_skempi_floors}\par}
+\figcaption{One mechanism of association held out whole. Grey bars are fitted on sixty features.}
+
+\begin{finding}
+Every unfitted physical quantity beats both fitted models, and the reasoned rule beats all of them.
+\end{finding}
+\end{minipage}};
+
+% ================================================================ column 3
+\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.35in]current page.north west) {\begin{minipage}{14.6in}
+\colsetup
 \begin{derivation}
-\subhead{Derived, not fitted}
-Treating the bound complex as a harmonic well, with $\sigma_{\text{iface}}$ the interface precision and $\sigma_0$ the precision the binder reaches within itself,
-{\fontsize{34}{42}\selectfont
+\subhead{What a theory looks like}
+{\captiontype The chain one session stated before writing any code. Nothing in it is fitted.\par}
+\vspace{0.14in}
+{\fontsize{29}{38}\selectfont
+\begin{tabular}{@{}p{4.0in}p{9.0in}@{}}
+Harmonic well & Equipartition sets the force constant to the thermal energy over the square of the fluctuation. The cross-chain error estimates it.\\[0.10in]
+Stiffness is depth & For a well of fixed shape, curvature at the minimum is proportional to depth. A stiffer interface is a deeper one.\\[0.10in]
+Divide out the predictor & The reported error inflates where the predictor modelled the chain poorly. Measuring it against the binder's own internal error removes that, and the units with it.\\[0.10in]
+Count what binding confines & Association removes six rigid-body degrees of freedom. Each confined quadratic degree contributes half the thermal energy times the log of the stiffness.\\
+\end{tabular}\par}
+\vspace{0.10in}
+{\fontsize{33}{42}\selectfont
 \[
 \kappa=\Big(\frac{\sigma_0}{\sigma_{\text{iface}}}\Big)^{2},\qquad
 \mathrm{p}K_\mathrm{d}=\mathrm{p}K_\mathrm{d,ref}+3\log_{10}\kappa .
 \]}
-The 3 is half the six rigid-body degrees of freedom that association confines. Nothing is fitted.
+{\captiontype The three is six halved. The reference affinity is an additive constant, so it cannot touch a rank correlation.\par}
 \end{derivation}
-\end{minipage}};
-
-% ================================================================ column 3
-\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.6in]current page.north west) {\begin{minipage}{14.6in}
-\colsetup
-
-{\centering\includegraphics[width=\linewidth]{poster_skempi_floors}\par}
-\figcaption{Measured structures, one mechanism of association held out whole. Grey bars are fitted on sixty features of the same structures.}
-
-\begin{finding}
-A rule derived from physics beats the published score on a target it has never seen. Every unfitted physical quantity beats both fitted models.
-\end{finding}
 
 \vspace{0.42in}
 \heading{5}{Scaling reasoning effort}

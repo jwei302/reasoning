@@ -355,69 +355,70 @@ def framework(D):
 
 
 def effort(D):
-    """Every arm in the project on one axis: does more reasoning make a better theory?"""
+    """Every arm as points, with a fitted trend and the mean at each setting."""
+    from scipy.optimize import curve_fit
     E = EFFORTS
-    arms = []
+    rows = []
 
-    def add(dom, vals, higher):
-        pts = [(i, v) for i, v in enumerate(vals) if v is not None]
-        if len(pts) >= 4:
-            arms.append((dom, pts, higher))
+    def add(v, hi):
+        pts = [(k, q) for k, q in enumerate(v) if q is not None]
+        if len(pts) < 4:
+            return
+        idx = np.array([q[0] for q in pts])
+        val = np.array([q[1] for q in pts], float)
+        val = val if hi else -val
+        r = np.full(5, np.nan)
+        r[idx] = (val - val.min()) / (val.max() - val.min())
+        rows.append(r)
 
     for reg, fams in D["digits"]["regimes"].items():
         for f, d in fams.items():
-            add("Digits", [d.get(e) for e in E], True)
+            add([d.get(e) for e in E], True)
     for x in D["tabular"]:
         for f in ("Astra", "Opus"):
             m = {q["effort"]: q["mean"] for q in x["models"].get(f, [])}
-            add("Tabular", [m.get(e) for e in E], x["higher"])
+            add([m.get(e) for e in E], x["higher"])
     for t in D["ipsae"]["tests"]:
-        add("Protein", [t["arms"].get(e) for e in E], True)
-    add("Protein", [D["ipsae"]["skempi"]["arms"].get(e) for e in E], True)
+        add([t["arms"].get(e) for e in E], True)
+    add([D["ipsae"]["skempi"]["arms"].get(e) for e in E], True)
 
-    COL = {"Digits": ASTRA, "Tabular": OPUS, "Protein": PUBLISHED}
-    norm = {k: np.full((0, 5), np.nan) for k in COL}
-    series = {k: [] for k in COL}
-    for dom, pts, hi in arms:
-        idx = np.array([q[0] for q in pts])
-        v = np.array([q[1] for q in pts], float)
-        v = v if hi else -v
-        row = np.full(5, np.nan)
-        row[idx] = (v - v.min()) / (v.max() - v.min())
-        series[dom].append(row)
+    R = np.vstack(rows)
+    X = np.repeat(np.arange(5)[None, :], R.shape[0], 0)
+    ok = ~np.isnan(R)
+    x, y = X[ok], R[ok]
+
+    def sat(r, a, b, tau):
+        return a + b * (1 - np.exp(-r / tau))
+    pr, _ = curve_fit(sat, x, y, p0=[0.3, 0.5, 1.5], maxfev=20000)
 
     fig, ax = plt.subplots(figsize=(14.6, 6.2))
-    x = np.arange(5)
-    allR = np.vstack([np.vstack(v) for v in series.values()])
-    q1 = np.nanpercentile(allR, 25, axis=0)
-    q3 = np.nanpercentile(allR, 75, axis=0)
-    ax.fill_between(x, q1, q3, color="#202A35", alpha=0.08, zorder=1, linewidth=0)
-    ax.plot(x, np.nanmean(allR, axis=0), "-", color="#202A35", linewidth=5.0, zorder=5,
-            label="All 32 arms")
+    rng = np.random.default_rng(0)
+    ax.plot(x + rng.uniform(-0.13, 0.13, x.size), y, "o", color="#8c8c8c", alpha=0.30,
+            markersize=9, markeredgewidth=0, zorder=2)
 
-    for dom in ("Digits", "Tabular", "Protein"):
-        R = np.vstack(series[dom])
-        ax.plot(x, np.nanmean(R, axis=0), "-o", color=COL[dom], linewidth=3.0, markersize=12,
-                markeredgecolor="white", markeredgewidth=1.5, zorder=4,
-                label=f"{dom} ({len(series[dom])})")
+    g = np.linspace(0, 4, 200)
+    ax.plot(g, sat(g, *pr), "-", color="#202A35", linewidth=4.2, zorder=4, label="fitted trend")
 
-    ax.set_xticks(x); ax.set_xticklabels(E, fontsize=19)
-    ax.set_xlim(-0.12, 4.12)
-    ax.set_ylim(0.15, 0.88)
-    ax.set_yticks([0.2, 0.4, 0.6, 0.8])
-    ax.set_yticklabels(["worse", "", "", "better"], fontsize=18)
+    mu = np.nanmean(R, axis=0)
+    n = np.sum(ok, axis=0)
+    se = np.nanstd(R, axis=0, ddof=1) / np.sqrt(n)
+    ax.errorbar(np.arange(5), mu, yerr=1.96 * se, fmt="o", color=OPUS, markersize=15,
+                markeredgecolor="white", markeredgewidth=1.8, elinewidth=3.0, capsize=9,
+                capthick=3.0, zorder=5, label="mean, 95% interval")
+
+    ax.set_xticks(range(5)); ax.set_xticklabels(E, fontsize=19)
+    ax.set_xlim(-0.35, 4.35)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_yticks([0, 0.5, 1.0]); ax.set_yticklabels(["worst", "", "best"], fontsize=18)
     ax.set_xlabel("Reasoning effort", labelpad=10)
     ax.set_ylabel("Score within its own arm", labelpad=10)
     ax.set_title("More reasoning, better theories")
-    ax.legend(loc="lower right", frameon=True, framealpha=0.96, fontsize=16, ncol=2)
-    ax.grid(True, axis="y", color="#000000", alpha=0.08, linewidth=0.9)
-    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", frameon=True, framealpha=0.96, fontsize=17)
+    grid(ax)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
     fig.tight_layout(pad=0.3)
     save(fig, "poster_effort")
-
-
 
 def curves(D):
     """Training from written weights against training from random weights."""
