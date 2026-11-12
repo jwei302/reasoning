@@ -62,7 +62,7 @@ def ipsae_tests(D):
     """The three held-out questions, each comparing the published score, two fitted models and reasoning."""
     tests = D["ipsae"]["tests"]
     tests = tests[1:]
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 4.9))
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 4.4))
     for ax, t in zip(axes, tests):
         auc = t["metric"] == "AUC"
         floor, base = t["floor"], 0.55 if auc else 0.0
@@ -232,7 +232,7 @@ def digits(D):
 def powerlaw(D):
     """Error after gradient training against the effort that wrote the starting weights."""
     S = [s for s in D["digits"]["scaling"] if s["family"] == "Astra"]
-    fig, ax = plt.subplots(figsize=(14.6, 5.2))
+    fig, ax = plt.subplots(figsize=(14.6, 4.8))
     r = np.linspace(1, 5, 120)
     for s in S:
         c, m, ls, name = (ASTRA, "o", "-", "from written weights") if s["condition"] == "authored" else (GREY, "s", (0, (4, 3)), "from random weights")
@@ -266,7 +266,7 @@ def tabular(D):
         rows.append((t["label"], [k for k, _ in scored].index("__ours__") + 1))
     rows.sort(key=lambda r: r[1])
 
-    fig, ax = plt.subplots(figsize=(14.6, 5.4))
+    fig, ax = plt.subplots(figsize=(14.6, 5.0))
     for i, (label, rank) in enumerate(rows):
         ax.plot([i, i], [0.6, 6.4], color="#000", alpha=0.10, linewidth=1.4, zorder=1)
         for r in range(1, 7):
@@ -296,12 +296,12 @@ def framework(D):
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(14.6, 9.6))
+    fig, ax = plt.subplots(figsize=(14.6, 9.9))
     ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
 
     cols = [(16, 42, "Train split"), (44, 70, "Validation split"), (72, 98, "Test split")]
     for x0, x1, name in cols:
-        ax.text((x0 + x1) / 2, 92, name, ha="center", fontsize=30,
+        ax.text((x0 + x1) / 2, 94, name, ha="center", fontsize=30,
                 color="#202A35", fontweight="bold")
 
     def row(y0, y1, label, cells, fc, ec, tc):
@@ -318,22 +318,22 @@ def framework(D):
                                          arrowstyle="-|>", mutation_scale=34,
                                          linewidth=3.0, color=ec, zorder=2))
 
-    row(50, 84, "Deep\nlearning",
+    row(56, 88, "Deep\nlearning",
         ["Fit parameters\nby gradient\ndescent",
          "Tune and select\nthe checkpoint",
-         "Score once,\nfrozen"],
+         "Evaluate"],
         "#f4f4f4", GREY, "#555")
 
-    row(6, 40, "This\nwork",
+    row(4, 36, "This\nwork",
         ["State a theory,\nwrite it as code",
          "Read the errors,\nrevise the theory",
-         "Score once,\nfrozen"],
+         "Evaluate"],
         "#EDF3F8", YALE, YALE)
 
-    ax.add_patch(FancyArrowPatch((63, 40.6), (51, 40.6), arrowstyle="-|>", mutation_scale=32,
+    ax.add_patch(FancyArrowPatch((63, 36.6), (51, 36.6), arrowstyle="-|>", mutation_scale=32,
                                  linewidth=3.0, color=YALE, zorder=5,
-                                 connectionstyle="arc3,rad=0.45"))
-    ax.text(57, 47.6, "repeat", ha="center", fontsize=26, color=YALE)
+                                 connectionstyle="arc3,rad=0.42"))
+    ax.text(57, 46.5, "repeat", ha="center", fontsize=26, color=YALE)
     fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
 
@@ -374,7 +374,7 @@ def effort(D):
         return a + b * (1 - np.exp(-r / tau))
     pr, _ = curve_fit(sat, x, y, p0=[0.3, 0.5, 1.5], maxfev=20000)
 
-    fig, ax = plt.subplots(figsize=(14.6, 5.4))
+    fig, ax = plt.subplots(figsize=(14.6, 4.3))
     rng = np.random.default_rng(0)
     ax.plot(x + rng.uniform(-0.13, 0.13, x.size), y, "o", color="#8c8c8c", alpha=0.30,
             markersize=9, markeredgewidth=0, zorder=2)
@@ -517,7 +517,7 @@ def cycles(D):
            "finer angular\nenclosure evidence",
            "make evidence\nnecessary",
            "bowl and closed-four\nevidence"]
-    fig, ax = plt.subplots(figsize=(14.6, 6.4))
+    fig, ax = plt.subplots(figsize=(14.6, 6.2))
     x = np.arange(len(cyc))
     ax.plot(x[:4], val[:4], "-o", color=ASTRA, linewidth=3.6, markersize=14,
             markeredgecolor="white", markeredgewidth=1.8, zorder=4)
