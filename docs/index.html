@@ -52,14 +52,13 @@
       <p>&ldquo;Discovery commences with the awareness of anomaly.&rdquo;</p>
       <footer>Thomas S. Kuhn, <cite>The Structure of Scientific Revolutions</cite> (1962)</footer>
     </blockquote>
-    <p>Eratosthenes measured the Earth without leaving Egypt. At noon on the summer solstice the sun stood directly over Syene. In Alexandria, to the north, it cast a shadow. The angle of that shadow and the distance between the two cities gave him the circumference of the planet. Enrico Fermi dropped scraps of paper as the blast wave of the Trinity test passed and estimated its yield from how far they drifted. Neither had much data. Both had principles, and they reasoned from them until the world gave up a number.</p>
-    <p>Science alternates between two kinds of inference. We <em>deduce</em> from our current principles as far as they reach. When what we deduce stops matching what we observe, we collect data at the point of failure and reason <em>abductively</em> to a better principle. Then we deduce again. Deep learning is how we now perform the second move at scale, and we reach for it wherever data are plentiful and theory is thin, accepting a model nobody can read in exchange for a prediction.</p>
-    <p>A general-purpose reasoner may change that trade. Reasoning is what lets a person extrapolate from a handful of examples, and if a model can reason well enough to derive a mechanism rather than fit one, it should generalize where a fitted model cannot. This is the capability that matters most for scientific discovery, because the domains we care about are exactly the ones where data are expensive and principles are partial. So we ask four questions.</p>
+    <p>Science advances by two kinds of inference. We <em>deduce</em> from the principles we already hold, as far as they reach. Where deduction stops matching observation, we reason <em>abductively</em> from the failure to a better principle, and deduce again. Deep learning performs the second move at scale. We reach for it wherever data are plentiful and theory is thin, and we accept a predictor nobody can read in exchange for a number.</p>
+    <p>Before that trade existed, people made the inference by hand. Eratosthenes measured the circumference of the Earth from the angle of a shadow and the distance between two cities. Fermi estimated the yield of the Trinity test from how far scraps of paper drifted in the blast wave. Neither had much data. Both had principles, and reasoned from them until the world gave up a number.</p>
+    <p>A general-purpose reasoner may change the trade. If a model can derive a mechanism rather than fit one, it should generalize where a fitted model cannot. That is the capability that matters for scientific discovery, because the domains we care about are the ones where data are expensive and principles are partial. We ask three questions.</p>
     <ol class="research-questions question-list" role="list">
       <li>Given everything already in the pretraining corpus, how far does reasoning from first principles&nbsp;take&nbsp;us?</li>
-      <li>Can a general-purpose reasoner generalize better than deep learning when data are&nbsp;scarce?</li>
-      <li>Does reasoning keep helping as we scale it, or does it&nbsp;saturate?</li>
-      <li>Which domains still require new&nbsp;measurement?</li>
+      <li>Do stated theories generalize better than fitted models when data are scarce or held&nbsp;out?</li>
+      <li>Does reasoning keep helping as we scale&nbsp;it?</li>
     </ol>
     <p>We test three domains chosen to span the range from strong first-principles theory to almost none, and scale reasoning by the effort setting of two frontier model families.</p>
     <table class="domains">
@@ -76,7 +75,7 @@
   <section id="framework">
     <h2 class="num">First principles versus deep learning</h2>
     <p class="kicker">Keep the splits, change the learner</p>
-    <p>Deep learning fits parameters on a training split, selects a checkpoint on a validation split, and reports a test split. We keep all three splits and change one thing. In place of gradient descent, a reasoning model reads the training data, states an explicit theory of why the target is predictable, and writes that theory as code. It runs the program, reads its errors on the validation split, and revises. The final program is frozen and scored once on the test split, against learned models tuned on the same rows.</p>
+    <p>Deep learning fits parameters on a training split, selects a checkpoint on a validation split, and reports a test split. We keep all three splits and change one thing. In place of gradient descent, a reasoning model reads the training data, states an explicit theory of why the target is predictable, and writes that theory as code. It runs the program, reads its errors on the validation split, and revises.<sup class="note-ref"><a href="#note-1" id="note-ref-1" role="doc-noteref">1</a></sup> The final program is frozen and scored once on the test split, against learned models tuned on the same rows.</p>
     <figure class="box" id="fig-framework">
       <img class="plot zoomable" src="figs/poster_framework.svg" alt="The two learners side by side across train, validation and test splits">
       <figcaption>The controlled comparison. Both rows see the same three splits and use each split for the same purpose. Only the middle row changes.</figcaption>
@@ -109,7 +108,7 @@
     <p>The right panel asks a stranger question. Instead of writing a program that classifies, the model writes the weights of a neural network directly, every number chosen by argument rather than by an optimizer, and the network is then run unchanged. This is deep learning with the learning removed. Ninety six percent of test images are classified by a network no gradient ever touched.</p>
 
     <h3 class="sub">Reasoning as initialization</h3>
-    <p>Written weights are a starting point as well as a classifier. We trained each written network by gradient descent from its own written weights, and separately from random weights in the same architecture, with the optimizer, learning-rate search and training budget fixed in advance. Every parameter was trainable in both conditions. The only difference is where training began.</p>
+    <p>Written weights are a starting point as well as a classifier. We trained each written network by gradient descent from its own written weights, and separately from random weights in the same architecture, with the optimizer, learning-rate search and training budget fixed in advance. Every parameter was trainable in both conditions. The only difference is where training began.<sup class="note-ref"><a href="#note-2" id="note-ref-2" role="doc-noteref">2</a></sup></p>
     <figure class="box" id="fig-init">
       <img class="plot zoomable" src="figs/poster_powerlaw.svg" alt="Held-out error after training against reasoning effort, both axes logarithmic">
       <figcaption>Given the same architecture, networks initialized from written weights train to lower error than networks initialized at random, and the gap widens with reasoning effort. Both axes logarithmic.</figcaption>
@@ -128,7 +127,7 @@
   <section id="tabular">
     <h2 class="num">Reasoning on tabular data</h2>
     <p>Digits are one dataset, and one the models have read a great deal about. Tabular prediction is the fairer test. There are many datasets from many fields, the learned baselines are strong and well tuned, and gradient-boosted trees are the method practitioners actually reach for. <a href="#ref-tabarena">TabArena</a> curates such tasks with fixed splits and published baselines. We chose ten tasks across finance, commerce, economics, chemistry, materials and medicine before seeing any scores.</p>
-    <p>Each session received every training row and label the learned baselines saw. It wrote an account of why the target is predictable, then a program applying that account. Fitting coefficients, automated rule search and lookup tables were forbidden. Papers and general knowledge were allowed. Test labels never entered the workspace.</p>
+    <p>Each session received every training row and label the learned baselines saw. It wrote an account of why the target is predictable, then a program applying that account. Fitting coefficients, automated rule search and lookup tables were forbidden. Papers and general knowledge were allowed. Test labels never entered the workspace.<sup class="note-ref"><a href="#note-3" id="note-ref-3" role="doc-noteref">3</a></sup></p>
     <figure class="box" id="fig-tabular">
       <img class="plot zoomable" src="figs/poster_tabular.svg" alt="Rank of the reasoned theory among five tuned models on ten tabular tasks">
       <figcaption>Ten tasks from TabArena. Each ranks the reasoned theory against a linear model, a random forest, XGBoost, CatBoost and an MLP, all tuned on the same rows. Rank avoids comparing scores across tasks with different metrics.</figcaption>
@@ -144,7 +143,7 @@
   <section id="binding">
     <h2 class="num">Protein binding evaluation metrics</h2>
     <p>The previous two domains compare a stated theory against fitted models. This one compares it against a score a person reasoned their way to and published. When a structure predictor folds two protein chains together, it returns the complex and a matrix of predicted aligned error, its own estimate of how confident it is about the relative placement of each pair of residues. Turning that matrix into a number that says whether the two chains bind is an open problem, and <a href="#ref-ipsae">ipSAE</a> is a recent and well-regarded answer to it.</p>
-    <p>Each session receives the same matrix the published score receives, and the assignment of residues to chains. Coordinates, sequences, per-residue confidence and every published score are withheld by what is staged rather than by instruction. The fitted references, a linear regression and an MLP, train on sixty summary features of the same matrix.</p>
+    <p>Each session receives the same matrix the published score receives, and the assignment of residues to chains. Coordinates, sequences, per-residue confidence and every published score are withheld by what is staged rather than by instruction. The fitted references, a linear regression and an MLP, train on sixty summary features of the same matrix.<sup class="note-ref"><a href="#note-4" id="note-ref-4" role="doc-noteref">4</a></sup></p>
     <figure class="box" id="fig-ipsae">
       <img class="plot zoomable" src="figs/poster_ipsae.svg" alt="Detection and affinity on a target never seen, against the published score and two fitted models">
       <figcaption>Seven hundred and four designed binders. Both panels hold out an entire target, so the score is applied to a protein no session worked from. Detection on the left, affinity ranking on the right.</figcaption>
@@ -184,7 +183,7 @@
   <section class="footnotes" id="notes" role="doc-endnotes" aria-labelledby="notes-title">
     <h2 id="notes-title">Notes</h2>
     <ol>
-      <li id="note-1">The restriction forbids training a parameterized model, learned features and embeddings, pretrained weights, and per-pixel quantities estimated from the training images. Sessions examine the data only through code and summary statistics, never by viewing an image. <a class="note-back" href="#note-ref-1">&crarr;</a></li>
+      <li id="note-1">The restriction forbids training a parameterized model, learned features and embeddings, pretrained weights, and quantities estimated from the training labels. On images, sessions examine the data only through code and summary statistics, never by viewing an image. <a class="note-back" href="#note-ref-1">&crarr;</a></li>
       <li id="note-2">The protocol fixed the optimizer, learning-rate search, paired seed ordering and checkpoint selection before training. Forward-equivalence and gradient checks preceded each architecture. Seed counts differ by setting, and Opus has fewer completed pairs than Astra. <a class="note-back" href="#note-ref-2">&crarr;</a></li>
       <li id="note-3">Sessions may read papers and the web, and may use qualitative prior knowledge of a dataset. Individual test answers and outcome summaries computed over test rows are prohibited. Sessions disclosing exposure to full-dataset outcome tables were excluded by manual review. <a class="note-back" href="#note-ref-3">&crarr;</a></li>
       <li id="note-4">Each setting had up to three attempts, and the first session to finish was scored. Programs may call a language model at run time on the quantities their account names, never on the matrix itself. Restriction of range deflates every correlation in this cohort, because each case is a curated candidate rather than a random draw. <a class="note-back" href="#note-ref-4">&crarr;</a></li>
@@ -210,8 +209,6 @@
       <li id="ref-mnist">Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-based learning applied to document recognition. <i>Proceedings of the IEEE</i> 86(11), 2278&ndash;2324 (1998).</li>
       <li id="ref-tabarena">N. Erickson, L. Purucker, A. Shirkov, et al. TabArena: A Living Benchmark for Machine Learning on Tabular Data. Preprint (2025). <a href="https://arxiv.org/abs/2506.16791">arXiv</a></li>
       <li id="ref-ipsae">R. L. Dunbrack Jr. ipSAE: Scoring predicted protein-protein interfaces from AlphaFold. Preprint (2025). <a href="https://www.biorxiv.org/content/10.1101/2025.02.10.637595v1">bioRxiv</a></li>
-      <li id="ref-boltz">S. Passaro, G. Corso, J. Wohlwend, et al. Boltz-2: Towards Accurate and Efficient Binding Affinity Prediction. Preprint (2025). <a href="https://www.biorxiv.org/content/10.1101/2025.06.14.659707v1">bioRxiv</a></li>
-      <li id="ref-skempi">J. Jankauskaite, B. Jim&eacute;nez-Garc&iacute;a, J. Dapkunas, et al. SKEMPI 2.0: an updated benchmark of changes in protein-protein binding energy upon mutation. <i>Bioinformatics</i> 35(3), 462&ndash;469 (2019).</li>
     </ul>
   </section>
 </main>
