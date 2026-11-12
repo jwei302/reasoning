@@ -182,15 +182,15 @@ def digits(D):
     """How much training data the theory needed, and what trained models get."""
     R = D["digits"]["regimes"]
     refs = {r["label"]: r["accuracy"] for r in D["digits"]["references"]}
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 6.8),
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 7.5),
                              gridspec_kw={"width_ratios": [2.15, 1]})
 
     ax = axes[0]
     groups = [("full", "50,000"), ("ten", "10"), ("none", "0")]
     for j, (fam, c, name) in enumerate([("Astra", ASTRA, "GPT-6 Astra"), ("Opus", OPUS, "Claude Opus 5.5")]):
         ys = [max(R[k][fam].values()) for k, _ in groups]
-        xs = [i + (j - 0.5) * 0.38 for i in range(len(groups))]
-        ax.bar(xs, ys, width=0.36, color=c, edgecolor="white", linewidth=1.2, label=name, zorder=3)
+        xs = [i + (j - 0.5) * 0.33 for i in range(len(groups))]
+        ax.bar(xs, ys, width=0.31, color=c, edgecolor="white", linewidth=1.2, label=name, zorder=3)
         for x, y in zip(xs, ys):
             ax.text(x, y + 0.7, f"{y:.0f}", ha="center", va="bottom", fontsize=19,
                     fontweight="bold", color=c, zorder=4)
@@ -198,12 +198,12 @@ def digits(D):
     ax.set_xticklabels([n for _, n in groups], fontsize=19)
     ax.set_xlabel("Number of training images", labelpad=10)
     ax.set_title("Accuracy of a written theory")
-    ax.set_xlim(-0.60, 2.86)
+    ax.set_xlim(-0.52, 2.78)
     ax.legend(loc="lower left", frameon=True, framealpha=0.96, fontsize=16)
 
     ax = axes[1]
     ys = [max(R["weights"][f].values()) for f in ("Astra", "Opus")]
-    ax.bar([0, 1], ys, width=0.56, color=[ASTRA, OPUS], edgecolor="white", linewidth=1.2, zorder=3)
+    ax.bar([0, 1], ys, width=0.46, color=[ASTRA, OPUS], edgecolor="white", linewidth=1.2, zorder=3)
     for x, y, c in zip([0, 1], ys, [ASTRA, OPUS]):
         ax.text(x, y + 0.7, f"{y:.0f}", ha="center", va="bottom", fontsize=19,
                 fontweight="bold", color=c, zorder=4)
@@ -297,7 +297,7 @@ def framework(D):
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(14.6, 8.8))
+    fig, ax = plt.subplots(figsize=(14.6, 9.4))
     ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
 
     cols = [(16, 42, "Train split"), (44, 70, "Validation split"), (72, 98, "Test split")]
@@ -510,45 +510,38 @@ def effort_curves(D):
 
 
 def cycles(D):
-    """One digits session, cycle by cycle: a hypothesis, a measurement, a revision."""
-    cyc = [2, 3, 4, 5, 7]
-    val = [61.56, 76.31, 81.94, 85.15, 83.37]
-    why = ["continuity and\nterminal strokes",
-           "remove false\nseparator tolerance",
-           "finer angular\nenclosure evidence",
-           "make evidence\nnecessary",
-           "bowl and closed-four\nevidence"]
+    """One digits session across every revision it made."""
+    val = [22.63, 44.52, 69.46, 67.04, 72.84, 77.77, 79.95, 82.50,
+           82.86, 80.66, 84.36, 81.98, 85.41, 85.87, 86.26]
+    x = np.arange(1, len(val) + 1)
+    down = [k for k in range(1, len(val)) if val[k] < val[k - 1]]
+
     fig, ax = plt.subplots(figsize=(14.6, 6.2))
-    x = np.arange(len(cyc))
-    ax.plot(x[:4], val[:4], "-o", color=ASTRA, linewidth=3.6, markersize=14,
-            markeredgecolor="white", markeredgewidth=1.8, zorder=4)
-    ax.plot(x[3:], val[3:], "--o", color="#b4654a", linewidth=3.0, markersize=14,
-            markeredgecolor="white", markeredgewidth=1.8, zorder=4)
-    offs = [(0, 26), (0, 26), (0, 26), (-26, 20), (0, -52)]
-    has = ["center", "center", "center", "right", "center"]
-    for i, (v, w) in enumerate(zip(val, why)):
-        ax.annotate(w, (i, v), textcoords="offset points", xytext=offs[i], ha=has[i],
-                    fontsize=16, color="#536272", linespacing=1.35)
-        if i < 4:
-            ax.text(i, v - 2.4, f"{v:.1f}", ha="center", va="top", fontsize=18,
-                    fontweight="bold", color=ASTRA)
-        else:
-            ax.text(i + 0.16, v, f"{v:.1f}", ha="left", va="center", fontsize=18,
-                    fontweight="bold", color="#b4654a")
-    ax.annotate("the theory predicted a gain,\nthe measurement refused it,\nand the change was withdrawn",
-                (3.52, 90.6), ha="center", va="center",
-                fontsize=16, color="#b4654a", linespacing=1.35)
-    ax.set_xticks(x); ax.set_xticklabels([f"cycle {c}" for c in cyc], fontsize=18)
-    ax.set_xlim(-0.45, 4.6)
-    ax.set_ylim(55, 95)
+    ax.plot(x, val, "-", color=ASTRA, linewidth=3.4, zorder=3)
+    ax.plot(x, val, "o", color=ASTRA, markersize=12, markeredgecolor="white",
+            markeredgewidth=1.6, zorder=4)
+    for k in down:
+        ax.plot(x[k], val[k], "o", color="#b4654a", markersize=14,
+                markeredgecolor="white", markeredgewidth=1.8, zorder=5)
+
+    ax.annotate("first theory it stated", (1, 22.63), textcoords="offset points",
+                xytext=(16, 2), ha="left", fontsize=18, color="#536272")
+    ax.annotate("after fifteen revisions", (15, 86.26), textcoords="offset points",
+                xytext=(-2, -44), ha="right", va="top", fontsize=18, color="#536272")
+    ax.annotate("three revisions made it worse,\nand were withdrawn", (4, 67.04),
+                textcoords="offset points", xytext=(18, -8), ha="left", va="top",
+                fontsize=18, color="#b4654a", linespacing=1.35)
+
+    ax.set_xticks(range(1, 16, 2))
+    ax.set_xlim(0.3, 15.9)
+    ax.set_ylim(14, 96)
+    ax.set_xlabel("Revision")
     ax.set_ylabel("Validation accuracy (%)")
-    ax.set_title("Stating a theory, measuring it, revising it")
     grid(ax)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
     fig.tight_layout(pad=0.3)
     save(fig, "poster_cycles")
-
 
 def main():
     D = load()
