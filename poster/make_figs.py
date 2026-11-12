@@ -62,7 +62,7 @@ def ipsae_tests(D):
     """The three held-out questions, each comparing the published score, two fitted models and reasoning."""
     tests = D["ipsae"]["tests"]
     tests = tests[1:]
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 5.2))
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 4.9))
     for ax, t in zip(axes, tests):
         auc = t["metric"] == "AUC"
         floor, base = t["floor"], 0.55 if auc else 0.0
@@ -182,7 +182,7 @@ def digits(D):
     """How much training data the theory needed, and what trained models get."""
     R = D["digits"]["regimes"]
     refs = {r["label"]: r["accuracy"] for r in D["digits"]["references"]}
-    fig, axes = plt.subplots(1, 2, figsize=(13.4, 6.2),
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 6.4),
                              gridspec_kw={"width_ratios": [2.15, 1]})
 
     ax = axes[0]
@@ -232,7 +232,7 @@ def digits(D):
 def powerlaw(D):
     """Error after gradient training against the effort that wrote the starting weights."""
     S = [s for s in D["digits"]["scaling"] if s["family"] == "Astra"]
-    fig, ax = plt.subplots(figsize=(10.6, 5.8))
+    fig, ax = plt.subplots(figsize=(14.6, 5.2))
     r = np.linspace(1, 5, 120)
     for s in S:
         c, m, ls, name = (ASTRA, "o", "-", "from written weights") if s["condition"] == "authored" else (GREY, "s", (0, (4, 3)), "from random weights")
@@ -246,7 +246,7 @@ def powerlaw(D):
     ax.minorticks_off()
     ax.set_xlabel("Effort that wrote the starting weights")
     ax.set_ylabel("Held-out error after training (%)")
-    ax.set_title("Reasoning as initialization")
+    pass
     ax.legend(loc="lower left", frameon=True, framealpha=0.95, fontsize=15)
     grid(ax)
     save(fig, "poster_powerlaw")
@@ -266,7 +266,7 @@ def tabular(D):
         rows.append((t["label"], [k for k, _ in scored].index("__ours__") + 1))
     rows.sort(key=lambda r: r[1])
 
-    fig, ax = plt.subplots(figsize=(14.6, 5.0))
+    fig, ax = plt.subplots(figsize=(14.6, 5.4))
     for i, (label, rank) in enumerate(rows):
         ax.plot([i, i], [0.6, 6.4], color="#000", alpha=0.10, linewidth=1.4, zorder=1)
         for r in range(1, 7):
@@ -292,48 +292,51 @@ def tabular(D):
     save(fig, "poster_tabular")
 
 def framework(D):
-    """The controlled comparison, drawn for a full-width band."""
+    """Vertical: the two learners side by side, the three splits stacked."""
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(30, 8.2))
-    ax.set_xlim(0, 100); ax.set_ylim(0, 52); ax.axis("off")
+    fig, ax = plt.subplots(figsize=(14.6, 10.6))
+    ax.set_xlim(0, 100); ax.set_ylim(13, 100); ax.axis("off")
 
-    cols = [(16, 42, "Train split"), (45, 71, "Validation split"), (74, 99, "Test split")]
-    for x0, x1, name in cols:
-        ax.text((x0 + x1) / 2, 47.5, name, ha="center", fontsize=32,
-                color="#202A35", fontweight="bold")
+    lanes = [(21, 55, "Deep learning", "#f4f4f4", GREY, "#555"),
+             (59, 93, "This work", "#EDF3F8", YALE, YALE)]
+    rows = [(73, 92, "Train"), (43, 62, "Validation"), (16, 32, "Test")]
 
-    def row(y0, y1, label, cells, fc, ec, tc):
-        ax.text(0.5, (y0 + y1) / 2, label, ha="left", va="center", fontsize=31,
+    cells = {
+        ("Deep learning", "Train"): "Fit parameters\nby gradient descent",
+        ("Deep learning", "Validation"): "Tune and select\nthe checkpoint",
+        ("Deep learning", "Test"): "Score once,\nfrozen",
+        ("This work", "Train"): "Read the data, state a\ntheory, write it as code",
+        ("This work", "Validation"): "Run the program, read\nits errors, revise\nthe theory",
+        ("This work", "Test"): "Score once,\nfrozen",
+    }
+
+    for x0, x1, name, fc, ec, tc in lanes:
+        ax.text((x0 + x1) / 2, 96, name, ha="center", fontsize=25,
                 color=tc, fontweight="bold")
-        for (x0, x1, _), text in zip(cols, cells):
+        for y0, y1, rname in rows:
             ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0,
-                                        boxstyle="round,pad=0,rounding_size=1.3",
-                                        facecolor=fc, edgecolor=ec, linewidth=3.0, zorder=3))
-            ax.text((x0 + x1) / 2, (y0 + y1) / 2, text, ha="center", va="center",
-                    fontsize=27, color=tc, zorder=4, linespacing=1.45)
-        for a, b in zip(cols, cols[1:]):
-            ax.add_patch(FancyArrowPatch((a[1] + 0.4, (y0 + y1) / 2), (b[0] - 0.4, (y0 + y1) / 2),
-                                         arrowstyle="-|>", mutation_scale=34,
-                                         linewidth=3.0, color=ec, zorder=2))
+                                        boxstyle="round,pad=0,rounding_size=1.6",
+                                        facecolor=fc, edgecolor=ec, linewidth=2.4, zorder=3))
+            ax.text((x0 + x1) / 2, (y0 + y1) / 2, cells[(name, rname)], ha="center",
+                    va="center", fontsize=20, color=tc, zorder=4, linespacing=1.4)
+        for (ya0, _, _), (_, yb1, _) in zip(rows, rows[1:]):
+            ax.add_patch(FancyArrowPatch(((x0 + x1) / 2, ya0 - 0.6), ((x0 + x1) / 2, yb1 + 0.6),
+                                         arrowstyle="-|>", mutation_scale=26,
+                                         linewidth=2.4, color=ec, zorder=2))
 
-    row(26, 43, "Deep learning",
-        ["Fit parameters\nby gradient descent",
-         "Tune and select\nthe checkpoint",
-         "Score once,\nfrozen"],
-        "#f4f4f4", GREY, "#555")
+    for y0, y1, rname in rows:
+        ax.text(17, (y0 + y1) / 2, rname + "\nsplit", ha="right", va="center",
+                fontsize=23, color="#202A35", fontweight="bold", linespacing=1.35)
 
-    row(2, 19, "This work",
-        ["Read the data, state a\ntheory, write it as code",
-         "Run the program, read its\nerrors, revise the theory",
-         "Score once,\nfrozen"],
-        "#EDF3F8", YALE, YALE)
+    # revision loop beside the reasoning validation cell
+    ax.add_patch(FancyArrowPatch((94.4, 48), (94.4, 58), arrowstyle="-|>", mutation_scale=24,
+                                 linewidth=2.4, color=YALE, zorder=5,
+                                 connectionstyle="arc3,rad=-1.6"))
+    ax.text(99.6, 52.5, "repeat", ha="right", va="center", fontsize=20, color=YALE,
+            rotation=270)
 
-    ax.add_patch(FancyArrowPatch((64, 19.5), (52, 19.5), arrowstyle="-|>", mutation_scale=30,
-                                 linewidth=3.0, color=YALE, zorder=5,
-                                 connectionstyle="arc3,rad=0.42"))
-    ax.text(58, 23.4, "repeat", ha="center", fontsize=26, color=YALE)
     fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
 
@@ -374,7 +377,7 @@ def effort(D):
         return a + b * (1 - np.exp(-r / tau))
     pr, _ = curve_fit(sat, x, y, p0=[0.3, 0.5, 1.5], maxfev=20000)
 
-    fig, ax = plt.subplots(figsize=(14.6, 6.2))
+    fig, ax = plt.subplots(figsize=(14.6, 5.4))
     rng = np.random.default_rng(0)
     ax.plot(x + rng.uniform(-0.13, 0.13, x.size), y, "o", color="#8c8c8c", alpha=0.30,
             markersize=9, markeredgewidth=0, zorder=2)
@@ -395,7 +398,7 @@ def effort(D):
     ax.set_yticks([0, 0.5, 1.0]); ax.set_yticklabels(["worst", "", "best"], fontsize=18)
     ax.set_xlabel("Reasoning effort", labelpad=10)
     ax.set_ylabel("Score within its own arm", labelpad=10)
-    ax.set_title("More reasoning, better theories")
+    pass
     ax.legend(loc="lower right", frameon=True, framealpha=0.96, fontsize=17)
     grid(ax)
     for side in ("top", "right"):

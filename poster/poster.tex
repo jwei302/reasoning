@@ -40,7 +40,7 @@
 % ---------------------------------------------------------------- header
 \node[anchor=north,inner sep=0pt] at ([yshift=-1.1in]current page.north) {\begin{minipage}{40in}\centering
   {\fontsize{86}{96}\selectfont\color{yale}Deduce the World: How Far Can Reasoning Go?\par}
-  \vspace{0.26in}
+  \vspace{0.24in}
   {\fontsize{46}{56}\selectfont
   \begin{tabular}{@{}c@{\hspace{2.6in}}c@{}}
   Jeffrey Wei & Brian Cheung\\[0.10in]
@@ -53,8 +53,8 @@
 Results \& figures}
 \end{minipage}};
 
-% ================================================= band: section 1
-\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-4.5in]current page.north west) {\begin{minipage}{14.2in}
+% ================================================================ column 1
+\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-5.3in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
 \heading{1}{Theories, not fitted predictors}
 
@@ -62,40 +62,35 @@ Science deduces the world from first principles, revising its theories where the
 
 We ask whether a reasoning model can form scientific theories, and whether those theories generalize better than deep learning.
 
+{\centering\includegraphics[width=\linewidth]{poster_framework}\par}
+
 \vspace{0.04in}
 {\captiontype
 \begin{tabular}{@{}p{2.3in}p{11.4in}@{}}
 \textbf{May} & read papers and the web, measure the training data, inspect its own errors\\[0.08in]
 \textbf{May not} & fit parameters to labels, search automatically over rules, store examples, see the test split\\
 \end{tabular}\par}
-\end{minipage}};
 
-\node[anchor=north west,inner sep=0pt] at ([xshift=20.0in,yshift=-4.6in]current page.north west) {\begin{minipage}{24.2in}
-{\centering\includegraphics[width=\linewidth]{poster_framework}\par}
-\end{minipage}};
-
-% ================================================================ column 1
-\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-11.4in]current page.north west) {\begin{minipage}{14.6in}
-\colsetup
+\vspace{0.20in}
 \heading{2}{How much data a theory needs}
 
-{\centering\includegraphics[width=0.80\linewidth]{poster_digits}\par}
+{\centering\includegraphics[width=\linewidth]{poster_digits}\par}
 \figcaption{MNIST, 60,000 training and 10,000 test images. Best of five reasoning efforts; dashed lines are trained models.}
 
 \begin{finding}
 Given no training images at all, a theory of how digits are written classifies most of them.
 \end{finding}
-
-\vspace{0.14in}
-\subhead{Reasoning as initialization}
-Networks initialized from written weights train to lower error, and the gap widens with effort.
-
-{\centering\includegraphics[width=0.58\linewidth]{poster_powerlaw}\par}
 \end{minipage}};
 
 % ================================================================ column 2
-\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-11.4in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-5.3in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
+\subhead{Reasoning as initialization}
+Networks initialized from written weights train to lower error, and the gap widens with reasoning effort.
+
+{\centering\includegraphics[width=\linewidth]{poster_powerlaw}\par}
+
+\vspace{0.20in}
 \heading{3}{The loop the model runs}
 
 {\centering\includegraphics[width=\linewidth]{poster_cycles}\par}
@@ -105,7 +100,7 @@ Networks initialized from written weights train to lower error, and the gap wide
 It abduces a cause, deduces a change, and withdraws the change when the measurement refuses it.
 \end{finding}
 
-\vspace{0.14in}
+\vspace{0.20in}
 \heading{4}{The same protocol, ten fields}
 
 {\centering\includegraphics[width=\linewidth]{poster_tabular}\par}
@@ -117,20 +112,20 @@ Wins on small clinical tables, trails boosted trees on feature interactions.
 \end{minipage}};
 
 % ================================================================ column 3
-\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-11.4in]current page.north west) {\begin{minipage}{14.6in}
+\node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.3in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
 \heading{5}{Deriving a scientific score}
 
 Each session receives a structure predictor's error matrix and nothing else.
 
-{\centering\includegraphics[width=0.86\linewidth]{poster_ipsae}\par}
+{\centering\includegraphics[width=\linewidth]{poster_ipsae}\par}
 \figcaption{704 designed binders, holding out a whole target. Detection on the left, affinity on the right.}
 
 \begin{finding}
 A rule derived from physics beats the published score on a target it has never seen, and beats both fitted models.
 \end{finding}
 
-\vspace{0.14in}
+\vspace{0.16in}
 \begin{derivation}
 \subhead{The theory it stated}
 {\fontsize{30}{39}\selectfont
@@ -142,24 +137,18 @@ Treat the bound complex as a harmonic well. Equipartition makes the interface st
 \]}
 {\captiontype The three is six halved. Nothing is fitted.\par}
 \end{derivation}
-\end{minipage}};
 
-% ================================================= closing row
-\node[anchor=north west,inner sep=0pt] at ([xshift=0.9in,yshift=-29.9in]current page.north west) {\begin{minipage}{10.2in}
-\colsetup
+\vspace{0.20in}
 \heading{6}{Scaling reasoning effort}
 
 {\centering\includegraphics[width=\linewidth]{poster_effort}\par}
 
-\end{minipage}};
-
-\node[anchor=north west,inner sep=0pt] at ([xshift=16.6in,yshift=-29.9in]current page.north west) {\begin{minipage}{30.3in}
-\colsetup
+\vspace{0.16in}
 \heading{7}{So how far can reasoning go?}
 \bullets{
 \item Deep learning dominates the domains that are data-rich and theory-poor.
 \item Those are exactly the domains whose first principles nobody has written down yet.
-\item We hypothesize that as reasoning improves, models will supply them, and stated theories will replace fitted predictors there.
+\item As reasoning improves, we expect models to supply them, and stated theories to replace fitted predictors there.
 }
 \end{minipage}};
 
