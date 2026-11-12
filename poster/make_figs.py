@@ -213,13 +213,14 @@ def digits(D):
     ax.set_xlim(-0.62, 1.62)
 
     for ax in axes:
-        for label, name in [("linear classifier on pixels", "trained linear"),
-                            ("multilayer perceptron, 300 hidden", "trained MLP")]:
+        for label, name in [("linear classifier on pixels", "linear"),
+                            ("multilayer perceptron, 300 hidden", "MLP"),
+                            ("convolutional network", "CNN")]:
             v = refs[label]
             ax.axhline(v, color="#444", linestyle=(0, (5, 4)), linewidth=1.8, zorder=2)
             ax.text(ax.get_xlim()[1] - 0.06, v + 0.6, name,
                     ha="right", va="bottom", fontsize=15, color="#444", zorder=4)
-        ax.set_ylim(60, 103)
+        ax.set_ylim(60, 104)
         ax.set_yticks([60, 70, 80, 90, 100])
         ax.set_ylabel("Held-out accuracy (%)")
         ax.grid(True, axis="y", color="#000000", alpha=0.08, linewidth=0.9)
