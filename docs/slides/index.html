@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deduce the World &middot; Slides</title>
+<meta name="description" content="Slides for Deduce the World: How Far Can Reasoning Go? A reasoning model states a scientific theory, writes it as code, and revises it against validation, on handwritten digits, tabular data and protein binding.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Deduce the World &middot; Slides">
+<meta property="og:description" content="A reasoning model states a scientific theory, writes it as code, and revises it against validation. Slides for the project.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --u: min(1vw, 1.7778vh);
+  --ink: #1b1b1a; --ink-2: #4a4945; --ink-3: #7d7b74;
+  --rule: #d9d8d2; --wash: #f6f6f3; --hair: #8c8c8c;
+  --yale: #00356B; --teal: #377f94; --rust: #b4654a; --purple: #8669af;
+  --serif: "Source Serif 4", Georgia, serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: var(--serif); color: var(--ink); background: #e9e9e4;
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+body.notes-on { --u: min(1vw, 1.30vh); }
+
+/* ---- the stage ---- */
+.deck { position: fixed; inset: 0; display: grid; place-items: center; }
+body.notes-on .deck { align-items: start; padding-top: calc(var(--u) * 2); }
+.slide {
+  position: relative;
+  width: calc(var(--u) * 100); height: calc(var(--u) * 56.25);
+  background: #fff; box-shadow: 0 2px 18px rgba(0,0,0,.10);
+  padding: calc(var(--u) * 4.4) calc(var(--u) * 6.4);
+  display: none; flex-direction: column; justify-content: space-between;
+  gap: calc(var(--u) * 1.6);
+}
+.slide.on { display: flex; }
+
+/* ---- type scale, in slide units ---- */
+.eyebrow { font-size: calc(var(--u) * 1.25); font-weight: 600; color: var(--yale); letter-spacing: .02em; }
+.eyebrow.warn { color: var(--rust); }
+h1 { font-size: calc(var(--u) * 5.6); font-weight: 700; line-height: 1.08; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font-size: calc(var(--u) * 3.5); font-weight: 700; line-height: 1.12; text-wrap: balance; }
+h3 { font-size: calc(var(--u) * 2.1); font-weight: 700; line-height: 1.2; }
+p, li, td, th { font-size: calc(var(--u) * 1.62); line-height: 1.45; }
+.lead { font-size: calc(var(--u) * 1.85); line-height: 1.42; color: var(--ink-2); }
+.cap { font-size: calc(var(--u) * 1.18); line-height: 1.4; color: var(--ink-3); }
+.big { font-size: calc(var(--u) * 3.4); font-weight: 700; letter-spacing: -.01em; }
+.head { display: flex; flex-direction: column; gap: calc(var(--u) * .7); }
+.title-slide { justify-content: space-between; }
+.mid { justify-content: center; gap: calc(var(--u) * 2.6); }
+.wash { background: var(--wash); }
+.rule { width: calc(var(--u) * 8); height: calc(var(--u) * .34); background: var(--yale); }
+
+/* ---- figures ---- */
+figure { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+figure img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; }
+
+/* ---- columns, cards, tables ---- */
+.cols { display: flex; gap: calc(var(--u) * 3); flex: 1; min-height: 0; }
+.card { flex: 1; display: flex; flex-direction: column; gap: calc(var(--u) * 1.1);
+        padding-top: calc(var(--u) * 1.6); border-top: calc(var(--u) * .22) solid var(--yale); }
+.card.alt { border-top-color: var(--rust); }
+.card.plain { border-top-color: var(--hair); }
+.card.boxed { background: var(--wash); padding: calc(var(--u) * 1.8) calc(var(--u) * 2); }
+.card p { color: var(--ink-2); }
+.card h3 { color: var(--ink); }
+ul { padding-left: 1.1em; }
+li { margin-bottom: .32em; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-weight: 600; color: var(--ink-3); font-size: calc(var(--u) * 1.3);
+     padding: calc(var(--u) * .7) calc(var(--u) * .9); border-bottom: 1px solid var(--rule); }
+td { padding: calc(var(--u) * .78) calc(var(--u) * .9); border-bottom: 1px solid var(--rule); vertical-align: top; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.note { padding: calc(var(--u) * 1.3) calc(var(--u) * 1.6); background: var(--wash);
+        border-left: calc(var(--u) * .3) solid var(--yale); display: flex; flex-direction: column; gap: calc(var(--u) * .6); }
+.note.warn { border-left-color: var(--rust); }
+.foot { color: var(--ink-3); font-size: calc(var(--u) * 1.18); }
+.teal { color: var(--teal); } .rust { color: var(--rust); } .yale { color: var(--yale); }
+
+/* ---- framework diagram ---- */
+.flow { display: flex; flex-direction: column; gap: calc(var(--u) * 1.1); }
+.flow-row { display: flex; align-items: stretch; gap: calc(var(--u) * .9); }
+.flow-row .lane { width: calc(var(--u) * 11); display: flex; align-items: center;
+                  font-size: calc(var(--u) * 1.62); font-weight: 700; }
+.flow-row .colhead { flex: 1; text-align: center; font-weight: 600; font-size: calc(var(--u) * 1.5); }
+.cell { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+        padding: calc(var(--u) * 1.3) calc(var(--u) * 1.1); border: 1px solid var(--hair);
+        border-radius: calc(var(--u) * .5); background: #fff; color: var(--ink-2);
+        font-size: calc(var(--u) * 1.5); line-height: 1.3; }
+.flow-row.ours .cell { border-color: var(--yale); background: #f1f5f9; color: var(--yale); }
+.arrow { width: calc(var(--u) * 2.2); display: flex; align-items: center; justify-content: center;
+         color: var(--hair); font-size: calc(var(--u) * 1.8); }
+.flow-row.ours .arrow { color: var(--yale); }
+.steps { display: flex; align-items: stretch; gap: calc(var(--u) * .6); }
+.step { flex: 1; display: flex; flex-direction: column; gap: calc(var(--u) * .7);
+        padding: calc(var(--u) * 1.3) calc(var(--u) * 1.4); background: var(--wash); }
+.step h3 { color: var(--yale); font-size: calc(var(--u) * 1.9); }
+.step p { font-size: calc(var(--u) * 1.45); color: var(--ink-2); }
+.worked { display: flex; flex-direction: column; gap: calc(var(--u) * .5); }
+.worked .row { display: flex; gap: calc(var(--u) * 1.2); }
+.worked .k { width: calc(var(--u) * 8); font-weight: 700; color: var(--yale); }
+.worked .v { flex: 1; }
+
+/* ---- statement slide ---- */
+.slide.statement { background: var(--yale); color: #fff; }
+.slide.statement h1 { font-size: calc(var(--u) * 4.2); }
+.slide.statement .eyebrow { color: #a8c6e4; }
+.slide.statement .lead { color: #c9dcee; }
+
+/* ---- chrome ---- */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; height: 30px; display: flex; align-items: center;
+       justify-content: space-between; padding: 0 14px; font-size: 12px; color: var(--ink-3);
+       background: rgba(255,255,255,.72); backdrop-filter: blur(6px); }
+.bar a { color: var(--ink-3); }
+.bar .keys { font-variant-numeric: tabular-nums; }
+.bar button { font: inherit; color: var(--ink-3); background: none; border: 1px solid var(--rule);
+              border-radius: 3px; padding: 1px 8px; cursor: pointer; }
+.bar button:hover { color: var(--ink); border-color: var(--hair); }
+#notes { position: fixed; left: 0; right: 0; bottom: 30px; height: 26vh; overflow-y: auto; display: none;
+         padding: 14px 22px 18px; background: #fffdf7; border-top: 1px solid var(--rule); }
+body.notes-on #notes { display: block; }
+#notes p { font-size: 15.5px; line-height: 1.55; color: var(--ink-2); max-width: 70em; }
+#notes .who { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px; }
+.slide aside { display: none; }
+
+/* ---- print: one slide per landscape page ---- */
+@page { size: 1920px 1080px; margin: 0; }
+@media print {
+  body { background: #fff; overflow: visible; }
+  .bar, #notes { display: none !important; }
+  .deck { position: static; display: block; }
+  .slide { display: flex !important; width: 1920px; height: 1080px; box-shadow: none;
+           padding: 84px 124px; break-after: page; }
+  :root { --u: 19.2px; }
+}
+</style>
+</head>
+<body>
+
+<main class="deck" id="deck">
+
+<section class="slide title-slide on" id="s1">
+  <p class="eyebrow">Group meeting &middot; November 2026</p>
+  <div class="head" style="gap:calc(var(--u)*1.4)">
+    <div class="rule"></div>
+    <h1>Deduce the World</h1>
+    <h2 class="yale" style="font-weight:400">How far can reasoning go?</h2>
+  </div>
+  <div style="display:flex;gap:calc(var(--u)*6)">
+    <div><p style="font-weight:600">Jeffrey Wei</p><p class="cap">Yale University</p></div>
+    <div><p style="font-weight:600">Brian Cheung</p><p class="cap">University of California, San Francisco</p></div>
+  </div>
+  <aside>This is the work behind the QBI symposium poster. One question runs through it: can a reasoning model write down a theory of a domain, the way a scientist would, instead of fitting parameters to data? Three domains, one framework. I will be honest about where it works, where it does not, and one result we had to remove.</aside>
+</section>
+
+<section class="slide mid wash" id="s2">
+  <h1>Can a reasoning model form a scientific theory?</h1>
+  <p class="lead" style="max-width:38em">Science deduces the world from first principles, and revises a theory where its predictions fail. We ask whether a reasoning model can do the same, and whether its theories generalize better than deep learning.</p>
+  <aside>Two halves to the question. First, can the model state a theory at all: an account of the domain that it writes down and then executes, rather than parameters it fits. Second, when it does, does that theory hold up on held-out data as well as a model trained on the same rows. Deep learning is the comparison throughout, because it is the thing that currently wins in data-rich domains where nobody has written the theory down.</aside>
+</section>
+
+<section class="slide" id="s3">
+  <div class="head">
+    <p class="eyebrow">The framework</p>
+    <h2>The model states a theory instead of fitting one</h2>
+  </div>
+  <div class="flow">
+    <div class="flow-row">
+      <div class="lane"></div>
+      <div class="colhead">Train split</div><div class="arrow"></div>
+      <div class="colhead">Validation split</div><div class="arrow"></div>
+      <div class="colhead">Test split</div>
+    </div>
+    <div class="flow-row">
+      <div class="lane" style="color:var(--ink-2)">Deep<br>learning</div>
+      <div class="cell">Fit parameters by gradient descent</div>
+      <div class="arrow">&rarr;</div>
+      <div class="cell">Tune and select the checkpoint</div>
+      <div class="arrow">&rarr;</div>
+      <div class="cell">Evaluate</div>
+    </div>
+    <div class="flow-row ours">
+      <div class="lane yale">This<br>work</div>
+      <div class="cell">State a theory, write it as code</div>
+      <div class="arrow">&rarr;</div>
+      <div class="cell">Read the errors, revise the theory, repeat</div>
+      <div class="arrow">&rarr;</div>
+      <div class="cell">Evaluate once</div>
+    </div>
+  </div>
+  <p class="foot">Same splits and same test set as the learned models. The theory is frozen as a program before the test split is scored.</p>
+  <aside>Read this as two pipelines over the same three splits. Deep learning fits parameters on train, tunes on validation, evaluates on test. In this work the model states a theory on train and writes it as code. On validation it reads its own errors, revises the theory, and repeats. Then the program is frozen and scored on test once. The point is that the learned models and the stated theory see exactly the same rows. Only the way the rows are used differs.</aside>
+</section>
+
+<section class="slide" id="s4">
+  <div class="head">
+    <p class="eyebrow">The framework</p>
+    <h2>What the model may and may not do</h2>
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h3 class="yale">May</h3>
+      <ul>
+        <li>Read papers and the web</li>
+        <li>Measure the training data</li>
+        <li>Inspect its own errors on validation</li>
+      </ul>
+    </div>
+    <div class="card alt">
+      <h3 class="rust">May not</h3>
+      <ul>
+        <li>Fit parameters to labels</li>
+        <li>Search automatically over rules</li>
+        <li>Store training examples</li>
+        <li>See the test split</li>
+      </ul>
+    </div>
+  </div>
+  <p class="foot">The line we draw: a theory can be informed by data, but no number in it is fitted to labels.</p>
+  <aside>This is the part people usually push on, so it is worth being explicit. The model is allowed to look at the data the way a scientist would: summary statistics, distributions, its own confusion matrix on validation. It can read the literature. What it cannot do is any of the things that turn the exercise back into machine learning: fitting coefficients to labels, running an automated search over rules, memorizing examples, or touching the test split. Every constant it writes has to be stated as part of the theory.</aside>
+</section>
+
+<section class="slide" id="s5">
+  <div class="head">
+    <p class="eyebrow">Three domains</p>
+    <h2>One framework, three domains, each with a learned competitor</h2>
+  </div>
+  <table>
+    <tr><th style="width:26%">Domain</th><th style="width:42%">What the theory has to do</th><th style="width:32%">Learned competitor</th></tr>
+    <tr><td class="yale">Handwritten digits, MNIST</td><td>Classify digits, then write every weight of a network by hand</td><td>Linear classifier, MLP, CNN</td></tr>
+    <tr><td class="yale">Tabular prediction, TabArena</td><td>Predict ten tasks from six fields, on fixed splits</td><td>Linear, random forest, XGBoost, CatBoost, MLP</td></tr>
+    <tr><td class="yale">Protein binding</td><td>Derive a binding score from a structure predictor’s own error estimates</td><td>Published ipSAE score, fitted linear model, fitted MLP</td></tr>
+  </table>
+  <p class="foot">Two reasoning models throughout: GPT&#8209;6 Astra and Claude Opus 5.5, each at five reasoning efforts.</p>
+  <aside>The domains were chosen to span how much theory already exists. Digits are a perception task where deep learning is the default and nobody has a written theory of handwriting that classifies well. Tabular prediction is the general case, where gradient-boosted trees are the default. Protein binding is the scientific case, where there is real physics and also a published, human-derived score to compare against. In every domain the competitor is trained or tuned on the same rows the model reasons from.</aside>
+</section>
+
+<section class="slide" id="s6">
+  <div class="head">
+    <p class="eyebrow">Digits &middot; MNIST</p>
+    <h2>With no training images, a stated theory reaches 94%</h2>
+  </div>
+  <figure><img src="figs/slide_digits.svg" alt="MNIST held-out accuracy. Reasoning through code, written from 50,000, 10 and 0 training images: GPT-6 Astra 94, 90, 86 and Claude Opus 5.5 97, 95, 94. Reasoning through weights with no optimizer: Astra 91, Opus 96. Dashed reference lines for a linear classifier at 88, an MLP at 95 and a CNN at 99."></figure>
+  <p class="cap">Held-out accuracy on the 10,000 MNIST test images. Bars are the best of five reasoning efforts. Dashed lines are trained models.</p>
+  <aside>Left panel: the model writes a classifier as code, from a theory of how digits are written. The x axis is how many training images it was allowed to look at while forming that theory. At zero it never sees an image, only the task description. Opus still reaches 94 percent, above a linear classifier and just under an MLP. Astra reaches 86. Right panel: the model writes every weight of a network directly, with no optimizer at all. Opus 96, Astra 91. The CNN at 99 is out of reach in every setting. Caveat to say out loud: each bar is the best of five reasoning efforts. For Opus with zero images, every one of the five efforts is above the linear classifier.</aside>
+</section>
+
+<section class="slide" id="s7">
+  <div class="head">
+    <p class="eyebrow">Digits &middot; reasoning as initialization</p>
+    <h2>Written weights become a better starting point as effort rises</h2>
+  </div>
+  <figure><img src="figs/slide_init.svg" alt="Log-log plot of held-out error after training against the reasoning effort that wrote the starting weights. Networks started from written weights fall from about 1.8 percent error at low effort to about 0.9 percent at max. Networks started from random weights fall more slowly, to about 1.3 percent."></figure>
+  <p class="cap">GPT&#8209;6 Astra. Same architecture in both arms, then trained by gradient descent. Only the starting weights differ.</p>
+  <aside>The question here: can a model reason out an architecture and its weights directly, and is what it writes a better starting point than random initialization. Both arms use the architecture the model wrote at that effort and train it the same way. At low effort there is no difference. By xhigh and max, starting from the written weights trains to about 0.9 percent error, against about 1.3 to 1.4 percent from random. Caveats: the high setting reverses, this is two seeds, and it is one model family. Opus shows no trend in either arm, so the widening gap is an Astra result, not yet a general one.</aside>
+</section>
+
+<section class="slide" id="s8">
+  <div class="head" style="flex-direction:row;justify-content:space-between;align-items:flex-end;gap:calc(var(--u)*3)">
+    <div class="head" style="flex:1">
+      <p class="eyebrow">Digits &middot; the deduction&ndash;abduction loop</p>
+      <h2>The model revises its own theory where it fails</h2>
+    </div>
+    <div style="text-align:right">
+      <p class="big"><span class="rust">23%</span> <span style="color:var(--ink-3)">&rarr;</span> <span class="teal">86%</span></p>
+      <p class="cap">validation accuracy</p>
+    </div>
+  </div>
+  <figure><img src="figs/slide_loop.svg" alt="Validation accuracy across fifteen revisions of one digits session, rising from 23 percent for the first stated theory to 86 percent after the fifteenth. Three revisions lowered accuracy and are marked in rust."></figure>
+  <p class="cap">One GPT&#8209;6 Astra digits session, every revision it made. Each began with a written hypothesis.</p>
+  <aside>This is one session, every revision it made, in order. The first theory it stated classifies 23 percent of validation digits. Fifteen revisions later it is at 86. What matters is how it got there. Each revision starts with a written hypothesis about why the current theory fails, made before any code changes. Three revisions made things worse, marked in rust, and the model withdrew them rather than keep tuning. At the end it froze the program and wrote that further tweaks to the same rules would be accommodation rather than a stronger theory.</aside>
+</section>
+
+<section class="slide wash" id="s9">
+  <div class="head">
+    <p class="eyebrow">Digits &middot; the deduction&ndash;abduction loop</p>
+    <h2>Abduce a cause, deduce its consequence, measure</h2>
+  </div>
+  <div class="steps">
+    <div class="step"><h3>Abduce</h3><p>Read the errors and propose a cause</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><h3>Deduce</h3><p>Work out what that cause predicts</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><h3>Measure</h3><p>Test the prediction on validation</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><h3>Form</h3><p>Keep what holds, withdraw what fails</p></div>
+  </div>
+  <div class="worked">
+    <p class="cap" style="font-weight:600">One revision from that session, the tenth</p>
+    <div class="row"><div class="k">Abduce</div><div class="v">Some eights fail the closed-loop test because of a tiny gap in the stroke.</div></div>
+    <div class="row"><div class="k">Deduce</div><div class="v">Tolerating one missing direction should recover them, at a risk to threes.</div></div>
+    <div class="row"><div class="k">Measure</div><div class="v">Threes read as eights rose from 218 to 1,495.</div></div>
+    <div class="row"><div class="k">Form</div><div class="v">Hypothesis rejected. The next revision restored the strict test.</div></div>
+  </div>
+  <aside>This is the loop, stated as the model actually ran it. Abduction is the inference to a cause: looking at the confusion matrix and proposing why the theory fails. Deduction works out what that cause implies, including what else should change if it is right. Then measure on validation, and keep only what holds. The tenth revision is a clean example because it failed. The model guessed that eights were being missed because a small pen gap broke its closed-loop test, predicted that relaxing the test would recover them, and flagged in advance that threes might start reading as eights. They did, sevenfold. It rejected its own hypothesis and reverted.</aside>
+</section>
+
+<section class="slide" id="s10">
+  <div class="head">
+    <p class="eyebrow">Tabular &middot; TabArena</p>
+    <h2>Theories win small medical and credit tables, and lose on regression</h2>
+  </div>
+  <figure><img src="figs/slide_tabular.svg" alt="Rank of the stated theory among six on ten TabArena tasks. First on German credit, diabetes and blood donation. Third on bank churn, fourth on online shopping, fifth on coupon acceptance. Fifth on California housing, wine quality and concrete strength, and sixth on used Fiat 500."></figure>
+  <p class="cap">Ten TabArena tasks. The best stated theory, ranked against a linear model, a random forest, XGBoost, CatBoost and an MLP, all tuned on the same rows.</p>
+  <aside>Same framework, ten tasks from TabArena with its fixed splits. Each row ranks the best stated theory against five models tuned on the same rows. It places first on three small classification tables: German credit, diabetes and blood donation. Those are domains where the risk factors are written down in the literature and there is not much data. It is middling on the larger commerce tasks. It loses on every regression task, fifth or sixth. Regression rewards getting interaction structure exactly right, which is what a fitted model is good at and a short written theory is not. Caveat: the theory shown is the best over both models and five efforts.</aside>
+</section>
+
+<section class="slide" id="s11">
+  <div class="head">
+    <p class="eyebrow">Protein binding</p>
+    <h2>Derive a binding score, against one a person published</h2>
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h3>What it is given</h3>
+      <p>A structure predictor folds two chains together and returns a matrix of predicted aligned error: its own estimate of how sure it is about the placement of each pair of residues. The model gets that matrix and which residues belong to which chain.</p>
+    </div>
+    <div class="card plain">
+      <h3>What it is not given</h3>
+      <p>Coordinates, sequences, per-residue confidence and every published score are withheld by what is staged, not by instruction. The fitted references train on sixty summary features of the same matrix.</p>
+    </div>
+    <div class="card alt">
+      <h3>What it is up against</h3>
+      <p>ipSAE, a recent and well-regarded score a person reasoned their way to and published. Plus a linear regression and an MLP fitted to the same matrix.</p>
+    </div>
+  </div>
+  <p class="foot">Turning a predicted-error matrix into a number that says whether two chains bind is an open problem.</p>
+  <aside>This is the domain where there is real physics to reason from, and also a human-derived answer to compare against. The input is deliberately thin: just the predicted aligned error matrix and the chain assignment. Everything that would let the model look up or shortcut the answer is absent from what it is handed, rather than forbidden by a prompt, which is the stronger form of the control. ipSAE is the comparison that matters. It is not a fitted model, it is a person reasoning from the same matrix and publishing the result.</aside>
+</section>
+
+<section class="slide" id="s12">
+  <div class="head">
+    <p class="eyebrow">Protein binding</p>
+    <h2>On a target it never saw, the derived rule beats the published score</h2>
+  </div>
+  <figure><img src="figs/slide_ipsae.svg" alt="Two panels. Binding detection on an unseen target, AUC: published ipSAE 0.641, fitted linear 0.594, fitted MLP 0.636, derived by reasoning 0.682 at best. Affinity ranking on an unseen target, Spearman rho: ipSAE 0.145, linear 0.076, MLP 0.044, derived by reasoning 0.252 at best."></figure>
+  <p class="cap">704 designed binders. Both panels hold out an entire target, so the score is applied to a protein no session worked from. The column of points is the five reasoning efforts.</p>
+  <aside>Left, detection: does this pair bind at all. The derived rule reaches 0.682 AUC against ipSAE at 0.641. Right, affinity ranking, which is the harder task: 0.252 Spearman against 0.145. Note what happens to the two fitted models on the right. The linear model gets 0.076 and the MLP 0.044, essentially nothing. They fit the targets they trained on and do not transfer to a new one. The derived rule transfers because it is a statement about physics rather than a fit to these targets. Both numbers are the best of five efforts, and the spread across efforts is the column of points.</aside>
+</section>
+
+<section class="slide wash" id="s13">
+  <div class="head">
+    <p class="eyebrow">Protein binding</p>
+    <h2>The stated theory, in the model’s own terms</h2>
+  </div>
+  <div class="cols" style="align-items:center">
+    <div style="flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*1.2)">
+      <p>Treat the bound complex as a harmonic well. Equipartition makes the interface stiffness the inverse square of its fluctuation, and a stiffer well is a deeper one.</p>
+      <p>Dividing by the binder’s own internal error removes the predictor, and the units with it. Association confines six rigid-body degrees of freedom, each worth half the thermal energy times the log of the stiffness.</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*1.6);align-items:center">
+      <img src="figs/slide_equation.svg" alt="Kappa equals sigma nought over sigma interface, squared. pKd equals pKd reference plus three log base ten of kappa." style="width:72%;height:auto">
+      <div class="note">
+        <p>It never counts a contact, so it does not grow with the size of the interface.</p>
+        <p>It has no free parameter. The published score has a cutoff a user chooses.</p>
+      </div>
+    </div>
+  </div>
+  <p class="foot">The factor of three is six rigid-body degrees of freedom halved. It is not chosen.</p>
+  <aside>Worth reading the derivation out, because the claim is that this is a derivation and not a curve fit. Model the bound complex as a harmonic well. Equipartition relates stiffness to the square of the fluctuation, and the predicted aligned error stands in for the fluctuation. Normalize by the binder’s own internal error, which cancels the predictor and the units. Then count: association freezes six rigid-body degrees of freedom, each contributing half k T log kappa, and converting to base ten gives the factor of three. Nothing in it is fitted. Next slide is how much of that I actually believe.</aside>
+</section>
+
+<section class="slide" id="s14">
+  <div class="head">
+    <p class="eyebrow">Protein binding</p>
+    <h2>How grounded is that, honestly?</h2>
+  </div>
+  <table>
+    <tr><th style="width:38%">Step</th><th style="width:20%">Status</th><th style="width:42%">Why</th></tr>
+    <tr><td>Equipartition relates stiffness to fluctuation</td><td class="teal">Correct</td><td class="cap" style="font-size:calc(var(--u)*1.42)">Standard statistical mechanics</td></tr>
+    <tr><td>Six degrees of freedom, halved, gives the factor of three</td><td class="teal">A real derivation</td><td class="cap" style="font-size:calc(var(--u)*1.42)">The counting is right and the units work out</td></tr>
+    <tr><td>A stiffer well is a deeper one</td><td class="rust">An assumption</td><td class="cap" style="font-size:calc(var(--u)*1.42)">True only for a well of fixed shape, and it sets the sign of the whole expression</td></tr>
+    <tr><td>Predicted aligned error stands in for a thermal fluctuation</td><td class="rust">A substitution</td><td class="cap" style="font-size:calc(var(--u)*1.42)">It is a network’s estimate of its own error, so the ratio is a ratio of model confidence</td></tr>
+  </table>
+  <div class="note">
+    <p>The strongest evidence is the predicted sign: the theory says the reference must be the binder’s own error, and it works on the binder and inverts on the target. That is a prediction the account made before it was tested.</p>
+  </div>
+  <aside>I want to be precise here rather than oversell, because this is the slide a physicist in the room will push on. Two of the four steps are solid: equipartition is textbook, and the counting that produces the factor of three is a genuine derivation with the units working out. Two are not laws. Stiffer being deeper holds only for a well of fixed shape, and it is that assumption rather than the counting that fixes the sign. And predicted aligned error is a neural network’s self-estimate, not a thermal fluctuation, so what we are really taking a ratio of is model confidence. What makes me take it seriously anyway is the sign prediction: the account says the normalizer has to be the binder’s own internal error, and when you use the target’s instead the correlation inverts, exactly as it should.</aside>
+</section>
+
+<section class="slide" id="s15">
+  <div class="head">
+    <p class="eyebrow warn">A result we removed</p>
+    <h2>On measured structures, the names alone were enough</h2>
+  </div>
+  <table style="width:88%">
+    <tr><th style="width:70%">What the probe was given</th><th class="num" style="width:30%;text-align:right">Spearman &rho;</th></tr>
+    <tr><td>The names of the two partner proteins, and nothing else</td><td class="num rust">0.382</td></tr>
+    <tr><td>Buried interface area alone, unfitted physical baseline</td><td class="num">0.354</td></tr>
+    <tr><td>The best derived rule, from the structure</td><td class="num">0.516</td></tr>
+  </table>
+  <div class="note warn">
+    <p>A probe with no structure at all, only the two names, outscored the physical baseline. Six of the twenty-five programs had been passing partner names to the model at run time.</p>
+    <p>So we cannot attribute the derived rule’s advantage there to the derivation. The result is off the poster and off the page.</p>
+  </div>
+  <p class="foot">SKEMPI, 25 frozen programs, mean across five held-out families. The designed-binder results are unaffected.</p>
+  <aside>This is the slide I would most want the group to push on. These complexes are deposited structures with public identifiers, and their measured constants are in the literature these models have read. When we checked, six of twenty-five programs were sending partner names to the model they call at run time, and the replies were quoting constants from the literature. The test that settled it: give a probe only the two names, no structure at all. It scores 0.382, above the unfitted physical baseline at 0.354. That means the names are a channel to the answer, so a ladder measured through them is not a measurement of reasoning from structure. We removed the result. The designed-binder work on the previous slides is unaffected, because those are designed sequences with no literature constants to recall.</aside>
+</section>
+
+<section class="slide" id="s16">
+  <div class="head">
+    <p class="eyebrow">Scaling reasoning effort</p>
+    <h2>More reasoning produces better theories, with large scatter</h2>
+  </div>
+  <figure><img src="figs/slide_effort.svg" alt="Scatter of all 32 arms normalized within themselves, against reasoning effort from low to max. Grey points are individual arms, widely spread. The means rise from low through max with 95 percent intervals, and a fitted trend curve rises and flattens."></figure>
+  <p class="cap">All 32 arms across the three domains. Each arm uses its own metric, so each is normalized to its own range.</p>
+  <aside>Every arm in the project ran at five reasoning efforts, which gives 32 independent curves. Each uses a different metric, so each is normalized to its own range: zero is that arm’s worst setting, one is its best. Twenty-three of 32 score higher at the top setting than the bottom, and the mean rises from low through xhigh. Beyond that we would be overreading. The flattening at the top is not significant: xhigh versus max is p equals 0.79, and linear, logarithmic and saturating fits are indistinguishable at R squared around 0.18. So: more reasoning helps across the range we tested, and we cannot say whether returns are diminishing or whether we ran out of settings. One exception worth naming: the protein arms do not improve with effort and may decline. Four arms, so weak evidence, but if it holds the reading is that effort buys the most where the model has to construct an account.</aside>
+</section>
+
+<section class="slide" id="s17">
+  <div class="head">
+    <p class="eyebrow">The pattern</p>
+    <h2>The boundary is a property of the field, not the model</h2>
+  </div>
+  <div class="cols">
+    <div class="card boxed">
+      <h3 class="yale">Stated theories do well</h3>
+      <p>where the mechanism has been written down somewhere, and the data are few.</p>
+      <ul>
+        <li>Digits from no training images</li>
+        <li>Small clinical and credit tables</li>
+        <li>Binding on an unseen target</li>
+      </ul>
+    </div>
+    <div class="card boxed alt">
+      <h3 class="rust">Fitted models do well</h3>
+      <p>where the signal lies in interactions nobody has described, and the data are plentiful.</p>
+      <ul>
+        <li>Every regression task we ran</li>
+        <li>Convolutional networks on images</li>
+        <li>Large commerce tables</li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-weight:600">And it is visible before you run the experiment.</p>
+  <aside>Pulling the three domains together. The split is not about which model is smarter. It tracks whether someone has already written down the mechanism, and how much data there is. Where the mechanism exists in the literature and the data are thin, a stated theory wins: digits with no images, small clinical tables, binding on a target nobody fit to. Where the signal lives in interactions nobody has described and there are plenty of rows, fitting wins: every regression task, convolutional networks, the big commerce tables. The useful part is that you can tell which regime you are in before running anything.</aside>
+</section>
+
+<section class="slide statement mid" id="s18">
+  <p class="eyebrow">The hypothesis</p>
+  <h1>As reasoning improves, we will develop stronger first principles in the theory-poor, data-rich domains where deep learning currently dominates.</h1>
+  <p class="lead" style="max-width:42em">Deep learning dominates exactly the domains where nobody has yet written the first principles down. We expect models to supply those principles, and stated theories to take over where fitted predictors hold now.</p>
+  <aside>This is the claim the whole project is pointed at, and it is a hypothesis, not a result. Read it the other way round and it is almost a tautology: deep learning wins where no one has written the theory down, because that is what it is for. What makes it a real prediction is the second half. If reasoning models get better at supplying those principles, the boundary we just drew should move, and it should move in a direction we can measure in advance. That is the experiment I would like to set up next.</aside>
+</section>
+
+<section class="slide wash" id="s19">
+  <div class="head">
+    <p class="eyebrow">Discussion</p>
+    <h2>Where I want the group to push</h2>
+  </div>
+  <div class="cols">
+    <div class="card alt"><h3>Contamination</h3><p>These models have read the literature of every domain we test. Recall and derivation are not fully separable, and the separation is worst where the result is most striking.</p></div>
+    <div class="card alt"><h3>Statistics</h3><p>Held-out counts in the protein work are small, nothing is bootstrapped, the initialization result is two seeds in one family, and an effort setting is not a measure of compute.</p></div>
+    <div class="card"><h3>What would move it</h3><p>A domain with real physics and no literature to recall. Suggestions welcome, and that is the main thing I want out of today.</p></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:calc(var(--u)*3)">
+    <p class="foot">Frozen framework, program and full research log for every run, including the ones that failed.</p>
+    <div style="text-align:right">
+      <p style="font-weight:600" class="yale">jeffrey.wei@yale.edu</p>
+      <p class="cap">jwei302.github.io/reasoning</p>
+    </div>
+  </div>
+  <aside>Three things I want from the discussion. First, contamination: I showed you the one case we caught, and I do not believe it is the only one. If you can think of a sharper control than the names-only probe, I want it. Second, the statistics are thin in the protein work specifically, and I would rather hear that now than at the symposium. Third and most important: the cleanest version of this experiment is a domain with real physics where there is no literature for the model to recall. Designed binders are the closest we have. If anyone has a better candidate, that is the most useful thing I could leave with today.</aside>
+</section>
+
+</main>
+
+<div id="notes"><p class="who">Speaker notes</p><p id="notes-body"></p></div>
+
+<div class="bar">
+  <span><a href="../">&larr; Deduce the World</a></span>
+  <span class="keys"><span id="counter">1 / 19</span> &nbsp;&middot;&nbsp; <span style="color:#a9a7a0">&larr; &rarr; move &nbsp; N notes &nbsp; F full screen</span></span>
+  <span><button id="notes-btn" type="button">Notes</button></span>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var counter = document.getElementById("counter");
+  var notesBody = document.getElementById("notes-body");
+  var i = 0;
+
+  function show(n, push) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+    counter.textContent = (i + 1) + " / " + slides.length;
+    var note = slides[i].querySelector("aside");
+    notesBody.textContent = note ? note.textContent : "No notes for this slide.";
+    if (push !== false && location.hash !== "#/" + (i + 1)) {
+      history.replaceState(null, "", "#/" + (i + 1));
+    }
+  }
+
+  function fromHash() {
+    var m = /^#\/(\d+)$/.exec(location.hash);
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (k === "ArrowRight" || k === "ArrowDown" || k === " " || k === "PageDown") { show(i + 1); e.preventDefault(); }
+    else if (k === "ArrowLeft" || k === "ArrowUp" || k === "PageUp") { show(i - 1); e.preventDefault(); }
+    else if (k === "Home") { show(0); e.preventDefault(); }
+    else if (k === "End") { show(slides.length - 1); e.preventDefault(); }
+    else if (k === "n" || k === "N") { document.body.classList.toggle("notes-on"); }
+    else if (k === "f" || k === "F") {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }
+  });
+
+  document.getElementById("notes-btn").addEventListener("click", function () {
+    document.body.classList.toggle("notes-on");
+  });
+
+  window.addEventListener("hashchange", function () { show(fromHash(), false); });
+  show(fromHash(), false);
+})();
+</script>
+</body>
+</html>
