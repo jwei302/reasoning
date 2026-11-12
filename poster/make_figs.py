@@ -233,7 +233,7 @@ def digits(D):
 def powerlaw(D):
     """Error after gradient training against the effort that wrote the starting weights."""
     S = [s for s in D["digits"]["scaling"] if s["family"] == "Astra"]
-    fig, ax = plt.subplots(figsize=(14.6, 4.8))
+    fig, ax = plt.subplots(figsize=(14.6, 4.2))
     r = np.linspace(1, 5, 120)
     for s in S:
         c, m, ls, name = (ASTRA, "o", "-", "from written weights") if s["condition"] == "authored" else (GREY, "s", (0, (4, 3)), "from random weights")
@@ -267,7 +267,7 @@ def tabular(D):
         rows.append((t["label"], [k for k, _ in scored].index("__ours__") + 1))
     rows.sort(key=lambda r: r[1])
 
-    fig, ax = plt.subplots(figsize=(14.6, 5.0))
+    fig, ax = plt.subplots(figsize=(14.6, 4.6))
     for i, (label, rank) in enumerate(rows):
         ax.plot([i, i], [0.6, 6.4], color="#000", alpha=0.10, linewidth=1.4, zorder=1)
         for r in range(1, 7):
@@ -516,7 +516,7 @@ def cycles(D):
     x = np.arange(1, len(val) + 1)
     down = [k for k in range(1, len(val)) if val[k] < val[k - 1]]
 
-    fig, ax = plt.subplots(figsize=(14.6, 6.2))
+    fig, ax = plt.subplots(figsize=(14.6, 5.3))
     ax.plot(x, val, "-", color=ASTRA, linewidth=3.4, zorder=3)
     ax.plot(x, val, "o", color=ASTRA, markersize=12, markeredgecolor="white",
             markeredgewidth=1.6, zorder=4)
