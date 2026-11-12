@@ -27,7 +27,7 @@
   \setlength{\leftmargin}{0.52in}\setlength{\labelwidth}{0.3in}\setlength{\itemsep}{0.17in}%
   \setlength{\topsep}{0.04in}\setlength{\parsep}{0pt}}#1\end{list}\endgroup}
 \newtcolorbox{finding}[1][]{enhanced,colback=wash,colframe=wash,boxrule=0pt,arc=0pt,
-  borderline west={4pt}{0pt}{yale},left=0.26in,right=0.24in,top=0.20in,bottom=0.20in,
+  left=0.30in,right=0.28in,top=0.20in,bottom=0.20in,
   before skip=0.12in,after skip=0.12in,fontupper=\fontsize{35}{45}\selectfont\raggedright,#1}
 \newtcolorbox{derivation}{enhanced,colback=white,colframe=rulegray,boxrule=1.2pt,arc=0pt,
   left=0.26in,right=0.26in,top=0.22in,bottom=0.22in,before skip=0.16in,after skip=0.20in,
@@ -44,7 +44,7 @@
   {\fontsize{46}{56}\selectfont
   \begin{tabular}{@{}c@{\hspace{2.6in}}c@{}}
   Jeffrey Wei & Brian Cheung\\[0.10in]
-  {\fontsize{31}{38}\selectfont\color{muted}Yale University} & {\fontsize{31}{38}\selectfont\color{muted}University of California, San Francisco}\\
+  {\fontsize{37}{45}\selectfont\color{muted}Yale University} & {\fontsize{37}{45}\selectfont\color{muted}University of California, San Francisco}\\
   \end{tabular}\par}
 \end{minipage}};
 \node[anchor=north east,inner sep=0pt] at ([xshift=-1.2in,yshift=-1.1in]current page.north east) {\begin{minipage}{2.9in}\centering
@@ -72,10 +72,12 @@ We ask whether a reasoning model can form scientific theories, and whether those
 \end{tabular}\par}
 
 \vspace{0.20in}
-\heading{2}{How much data a theory needs}
+\heading{2}{Reasoning on handwritten digits}
 
-Can a model classify handwritten digits from a stated theory of how digits are written, and how much data does it need to state one?
+MNIST is the test bed. We ask how much data a theory needs, whether a written theory is a better starting point than random initialization, and what the model does when a revision fails.
 
+\vspace{0.06in}
+\subhead{How much data a theory needs}
 {\centering\includegraphics[width=\linewidth]{poster_digits}\par}
 \figcaption{MNIST, 60,000 training and 10,000 test images. Best of five reasoning efforts; dashed lines are trained models.}
 
@@ -152,11 +154,8 @@ Does more reasoning produce better theories?
 
 \vspace{0.16in}
 \heading{6}{So how far can reasoning go?}
-\bullets{
-\item Deep learning dominates the domains that are data-rich and theory-poor.
-\item Those are exactly the domains whose first principles nobody has written down yet.
-\item As reasoning improves, we expect models to supply them, and stated theories to replace fitted predictors there.
-}
+
+We hypothesize that as language model reasoning improves, we will develop stronger first principles in the theory-poor, data-rich domains where deep learning currently dominates.
 \end{minipage}};
 
 \end{tikzpicture}

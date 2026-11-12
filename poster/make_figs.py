@@ -62,7 +62,7 @@ def ipsae_tests(D):
     """The three held-out questions, each comparing the published score, two fitted models and reasoning."""
     tests = D["ipsae"]["tests"]
     tests = tests[1:]
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 4.4))
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 5.2))
     for ax, t in zip(axes, tests):
         auc = t["metric"] == "AUC"
         floor, base = t["floor"], 0.55 if auc else 0.0
@@ -182,11 +182,11 @@ def digits(D):
     """How much training data the theory needed, and what trained models get."""
     R = D["digits"]["regimes"]
     refs = {r["label"]: r["accuracy"] for r in D["digits"]["references"]}
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 7.2),
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 6.8),
                              gridspec_kw={"width_ratios": [2.15, 1]})
 
     ax = axes[0]
-    groups = [("full", "50,000\nimages"), ("ten", "ten\nimages"), ("none", "no\nimages")]
+    groups = [("full", "50,000"), ("ten", "10"), ("none", "0")]
     for j, (fam, c, name) in enumerate([("Astra", ASTRA, "GPT-6 Astra"), ("Opus", OPUS, "Claude Opus 5.5")]):
         ys = [max(R[k][fam].values()) for k, _ in groups]
         xs = [i + (j - 0.5) * 0.38 for i in range(len(groups))]
@@ -196,9 +196,9 @@ def digits(D):
                     fontweight="bold", color=c, zorder=4)
     ax.set_xticks(range(len(groups)))
     ax.set_xticklabels([n for _, n in groups], fontsize=19)
-    ax.set_xlabel("Training images the model was shown", labelpad=10)
+    ax.set_xlabel("Number of training images", labelpad=10)
     ax.set_title("Accuracy of a written theory")
-    ax.set_xlim(-0.62, 3.25)
+    ax.set_xlim(-0.60, 2.86)
     ax.legend(loc="lower left", frameon=True, framealpha=0.96, fontsize=16)
 
     ax = axes[1]
@@ -220,14 +220,14 @@ def digits(D):
             ax.axhline(v, color="#444", linestyle=(0, (5, 4)), linewidth=1.8, zorder=2)
             ax.text(ax.get_xlim()[1] - 0.06, v + 0.6, name,
                     ha="right", va="bottom", fontsize=15, color="#444", zorder=4)
-        ax.set_ylim(60, 104)
-        ax.set_yticks([60, 70, 80, 90, 100])
+        ax.set_ylim(72, 104)
+        ax.set_yticks([75, 80, 85, 90, 95, 100])
         ax.set_ylabel("Held-out accuracy (%)")
         ax.grid(True, axis="y", color="#000000", alpha=0.08, linewidth=0.9)
         ax.set_axisbelow(True)
         for side in ("top", "right"):
             ax.spines[side].set_visible(False)
-    fig.tight_layout(w_pad=2.4)
+    fig.tight_layout(w_pad=1.4)
     save(fig, "poster_digits")
 
 def powerlaw(D):
@@ -297,7 +297,7 @@ def framework(D):
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(14.6, 9.9))
+    fig, ax = plt.subplots(figsize=(14.6, 8.8))
     ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
 
     cols = [(16, 42, "Train split"), (44, 70, "Validation split"), (72, 98, "Test split")]
@@ -375,7 +375,7 @@ def effort(D):
         return a + b * (1 - np.exp(-r / tau))
     pr, _ = curve_fit(sat, x, y, p0=[0.3, 0.5, 1.5], maxfev=20000)
 
-    fig, ax = plt.subplots(figsize=(14.6, 4.3))
+    fig, ax = plt.subplots(figsize=(14.6, 5.5))
     rng = np.random.default_rng(0)
     ax.plot(x + rng.uniform(-0.13, 0.13, x.size), y, "o", color="#8c8c8c", alpha=0.30,
             markersize=9, markeredgewidth=0, zorder=2)
