@@ -208,3 +208,8 @@ h3.sub { font-size: 1.08rem; line-height: 1.35; margin: 32px 0 10px; }
 }
 
 .tabs.wrap { flex-wrap: wrap; gap: 0 16px; }
+
+/* static figures exported from the poster */
+img.plot { width: 100%; height: auto; display: block; }
+img.zoomable { cursor: zoom-in; }
+.theorem .display { text-align: center; font-size: 1.05rem; margin: 10px 0 2px; }

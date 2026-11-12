@@ -49,9 +49,14 @@ def grid(ax):
     ax.set_axisbelow(True)
 
 
+WEB = HERE / "../docs/figs"
+
+
 def save(fig, name):
     OUT.mkdir(exist_ok=True)
+    WEB.mkdir(exist_ok=True)
     fig.savefig(OUT / (name + ".pdf"))
+    fig.savefig(WEB / (name + ".svg"))
     plt.close(fig)
     print("wrote", name)
 
