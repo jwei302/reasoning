@@ -516,7 +516,7 @@ def cycles(D):
     x = np.arange(1, len(val) + 1)
     down = [k for k in range(1, len(val)) if val[k] < val[k - 1]]
 
-    fig, ax = plt.subplots(figsize=(14.6, 5.3))
+    fig, ax = plt.subplots(figsize=(14.6, 6.0))
     ax.plot(x, val, "-", color=ASTRA, linewidth=3.4, zorder=3)
     ax.plot(x, val, "o", color=ASTRA, markersize=12, markeredgecolor="white",
             markeredgewidth=1.6, zorder=4)
