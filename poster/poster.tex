@@ -29,9 +29,10 @@
 \newtcolorbox{finding}[1][]{enhanced,colback=wash,colframe=wash,boxrule=0pt,arc=0pt,
   left=0.30in,right=0.28in,top=0.20in,bottom=0.20in,
   before skip=0.12in,after skip=0.12in,fontupper=\fontsize{35}{45}\selectfont\raggedright,#1}
-\newtcolorbox{closing}{enhanced,colback=yale,colframe=yale,boxrule=0pt,arc=0pt,
-  left=0.40in,right=0.38in,top=0.34in,bottom=0.34in,before skip=0.10in,after skip=0.10in,
-  fontupper=\color{white}\fontsize{39}{52}\selectfont\raggedright}
+\newtcolorbox{closing}{enhanced,colback=white,colframe=white,boxrule=0pt,arc=0pt,
+  borderline west={3.5pt}{0pt}{rulegray},left=0.40in,right=0.10in,top=0.10in,bottom=0.10in,
+  before skip=0.12in,after skip=0.10in,
+  fontupper=\fontsize{41}{54}\selectfont\raggedright}
 \newtcolorbox{derivation}{enhanced,colback=white,colframe=rulegray,boxrule=1.2pt,arc=0pt,
   left=0.26in,right=0.26in,top=0.22in,bottom=0.22in,before skip=0.16in,after skip=0.20in,
   fontupper=\fontsize{35}{45}\selectfont\raggedright}
@@ -103,20 +104,17 @@ What does a revision look like when the model makes one?
 \figcaption{One digits session, every revision it made. Each began with a written hypothesis.}
 
 \begin{finding}
-It abduces a cause, deduces a change, and withdraws the change when the measurement refuses it.
+This is the scientific method: propose a cause for the errors, predict what fixing it would do, measure, and keep the change only if the prediction held.
 \end{finding}
 
 \vspace{0.20in}
 \heading{3}{Reasoning on tabular data}
 
-Does the result survive outside images, in fields that differ in how much theory they already have?
+Does the same protocol compete on tabular data, where gradient-boosted trees are the default?
 
 {\centering\includegraphics[width=\linewidth]{poster_tabular}\par}
-\figcaption{Ten tasks from TabArena, ranked against five tuned models on the same rows.}
+\figcaption{Ten tasks from TabArena. Each ranks the reasoned theory against a linear model, a random forest, XGBoost, CatBoost and an MLP, all tuned on the same rows.}
 
-\begin{finding}
-Wins on small clinical tables, trails boosted trees on feature interactions.
-\end{finding}
 \end{minipage}};
 
 % ================================================================ column 3
