@@ -253,7 +253,7 @@ def powerlaw(D):
 
 
 def tabular(D):
-    """Where the reasoned theory places among the five tuned models, on each task."""
+    """Where the reasoned theory places among the five tuned models, compactly."""
     T = D["tabular"]
     rows = []
     for t in T:
@@ -263,36 +263,32 @@ def tabular(D):
         best = max(means) if t["higher"] else min(means)
         scored = sorted(list(t["learned"].items()) + [("__ours__", best)],
                         key=lambda kv: -kv[1] if t["higher"] else kv[1])
-        names = [k for k, _ in scored]
-        rows.append((t["label"], t["domain"], names.index("__ours__") + 1,
-                     "classification" if t["higher"] else "regression"))
-    rows.sort(key=lambda r: (r[2], r[0]))
+        rows.append((t["label"], [k for k, _ in scored].index("__ours__") + 1))
+    rows.sort(key=lambda r: r[1])
 
-    fig, ax = plt.subplots(figsize=(14.6, 7.8))
-    for i, (label, domain, rank, kind) in enumerate(rows):
-        y = len(rows) - 1 - i
-        ax.plot([1, 6], [y, y], color="#000", alpha=0.13, linewidth=1.6, zorder=1)
+    fig, ax = plt.subplots(figsize=(14.6, 5.0))
+    for i, (label, rank) in enumerate(rows):
+        ax.plot([i, i], [0.6, 6.4], color="#000", alpha=0.10, linewidth=1.4, zorder=1)
         for r in range(1, 7):
             if r != rank:
-                ax.plot(r, y, "o", color="#c9c9c9", markersize=13, zorder=2)
+                ax.plot(i, r, "o", color="#cfcfcf", markersize=9, zorder=2)
         c = OPUS if rank <= 3 else "#b4654a"
-        ax.plot(rank, y, "o", color=c, markersize=27, markeredgecolor="white",
-                markeredgewidth=2.0, zorder=4)
-        ax.text(rank, y, str(rank), ha="center", va="center", fontsize=16,
+        ax.plot(i, rank, "o", color=c, markersize=24, markeredgecolor="white",
+                markeredgewidth=1.8, zorder=4)
+        ax.text(i, rank, str(rank), ha="center", va="center", fontsize=15,
                 color="white", fontweight="bold", zorder=5)
-        ax.text(0.72, y, label, ha="right", va="center", fontsize=19)
-        ax.text(6.30, y, f"{domain}, {kind}", ha="left", va="center", fontsize=15, color="#777")
-
-    ax.set_xticks(range(1, 7))
-    ax.set_xticklabels(["1st", "2nd", "3rd", "4th", "5th", "6th"], fontsize=18)
-    ax.set_xlim(0.55, 6.45)
-    ax.set_ylim(-0.75, len(rows) - 0.25)
-    ax.set_yticks([])
-    ax.set_xlabel("Place of the reasoned theory among the five tuned models", labelpad=12)
-    for side in ("top", "right", "left"):
+    ax.set_xticks(range(len(rows)))
+    ax.set_xticklabels([r[0] for r in rows], rotation=38, ha="right", fontsize=17)
+    ax.set_xlim(-0.6, len(rows) - 0.4)
+    ax.invert_yaxis()
+    ax.set_yticks([1, 2, 3, 4, 5, 6])
+    ax.set_yticklabels(["1st", "2nd", "3rd", "4th", "5th", "6th"], fontsize=17)
+    ax.set_ylim(6.6, 0.4)
+    ax.set_ylabel("Place among the\nfive tuned models", fontsize=18)
+    for side in ("top", "right"):
         ax.spines[side].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    ax.tick_params(axis="x", length=0)
+    ax.tick_params(length=0)
+    fig.tight_layout(pad=0.3)
     save(fig, "poster_tabular")
 
 def framework(D):
@@ -511,10 +507,53 @@ def effort_curves(D):
     save(fig, "poster_effort_curves")
 
 
+
+def cycles(D):
+    """One digits session, cycle by cycle: a hypothesis, a measurement, a revision."""
+    cyc = [2, 3, 4, 5, 7]
+    val = [61.56, 76.31, 81.94, 85.15, 83.37]
+    why = ["continuity and\nterminal strokes",
+           "remove false\nseparator tolerance",
+           "finer angular\nenclosure evidence",
+           "make evidence\nnecessary",
+           "bowl and closed-four\nevidence"]
+    fig, ax = plt.subplots(figsize=(14.6, 6.4))
+    x = np.arange(len(cyc))
+    ax.plot(x[:4], val[:4], "-o", color=ASTRA, linewidth=3.6, markersize=14,
+            markeredgecolor="white", markeredgewidth=1.8, zorder=4)
+    ax.plot(x[3:], val[3:], "--o", color="#b4654a", linewidth=3.0, markersize=14,
+            markeredgecolor="white", markeredgewidth=1.8, zorder=4)
+    offs = [(0, 26), (0, 26), (0, 26), (-26, 20), (0, -52)]
+    has = ["center", "center", "center", "right", "center"]
+    for i, (v, w) in enumerate(zip(val, why)):
+        ax.annotate(w, (i, v), textcoords="offset points", xytext=offs[i], ha=has[i],
+                    fontsize=16, color="#536272", linespacing=1.35)
+        if i < 4:
+            ax.text(i, v - 2.4, f"{v:.1f}", ha="center", va="top", fontsize=18,
+                    fontweight="bold", color=ASTRA)
+        else:
+            ax.text(i + 0.16, v, f"{v:.1f}", ha="left", va="center", fontsize=18,
+                    fontweight="bold", color="#b4654a")
+    ax.annotate("the theory predicted a gain,\nthe measurement refused it,\nand the change was withdrawn",
+                (3.52, 90.6), ha="center", va="center",
+                fontsize=16, color="#b4654a", linespacing=1.35)
+    ax.set_xticks(x); ax.set_xticklabels([f"cycle {c}" for c in cyc], fontsize=18)
+    ax.set_xlim(-0.45, 4.6)
+    ax.set_ylim(55, 95)
+    ax.set_ylabel("Validation accuracy (%)")
+    ax.set_title("Stating a theory, measuring it, revising it")
+    grid(ax)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    fig.tight_layout(pad=0.3)
+    save(fig, "poster_cycles")
+
+
 def main():
     D = load()
     framework(D)
     effort(D)
+    cycles(D)
     effort_curves(D)
     curves(D)
     skempi_floors(D)
