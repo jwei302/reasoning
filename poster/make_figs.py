@@ -84,7 +84,7 @@ def ipsae_tests(D):
         ax.set_xlim(-0.72, 3.72)
         ax.set_ylim(base, 0.72 if auc else 0.30)
         ax.set_ylabel("AUC" if auc else r"Spearman $\rho$")
-        ax.set_title(f"{t['label']}\n{t['detail']}", fontsize=20, linespacing=1.3)
+        ax.set_title(f"{t['label'].replace('Binding or not', 'Binding detection')}\n{t['detail']}", fontsize=20, linespacing=1.3)
         grid(ax)
     handles = [plt.Rectangle((0, 0), 1, 1, facecolor=PUBLISHED, edgecolor="#333", label="ipSAE, published"),
                plt.Rectangle((0, 0), 1, 1, facecolor=GREY, edgecolor="#333", label="linear regression, fitted"),

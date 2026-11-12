@@ -123,15 +123,15 @@ Does the same framework compete on tabular data?
 % ================================================================ column 3
 \node[anchor=north west,inner sep=0pt] at ([xshift=32.3in,yshift=-5.3in]current page.north west) {\begin{minipage}{14.6in}
 \colsetup
-\heading{4}{Protein binding from first principles}
+\heading{4}{Protein binding evaluation metrics}
 
-Can a model derive a binding score from physics rather than fit one? Each session receives a structure predictor's error matrix and nothing else.
+Can a model derive a binding score from physics rather than fit one? Each session receives a structure predictor's predicted aligned error (PAE) matrix and nothing else.
 
 {\centering\includegraphics[width=\linewidth]{poster_ipsae}\par}
 \figcaption{704 designed binders, holding out a whole target. Detection on the left, affinity on the right.}
 
 \begin{finding}
-A rule derived from physics beats the published score on a target it has never seen, and beats both fitted models.
+On targets it never saw, the derived rule scores above the published score and above both fitted models.
 \end{finding}
 
 \vspace{0.16in}
@@ -144,7 +144,6 @@ Treat the bound complex as a harmonic well. Equipartition makes the interface st
 \kappa=\Big(\frac{\sigma_0}{\sigma_{\text{iface}}}\Big)^{2},\qquad
 \mathrm{p}K_\mathrm{d}=\mathrm{p}K_\mathrm{d,ref}+3\log_{10}\kappa .
 \]}
-{\captiontype The three is six halved. Nothing is fitted.\par}
 \end{derivation}
 
 \vspace{0.20in}
