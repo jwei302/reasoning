@@ -125,7 +125,7 @@ Does the same framework compete on tabular data?
 \colsetup
 \heading{4}{Protein binding evaluation metrics}
 
-Can a model derive a binding score from physics rather than fit one? Each session receives a structure predictor's predicted aligned error (PAE) matrix and nothing else.
+Can a model derive a binding score from physics rather than fit one? The reasoning model receives a structure predictor's predicted aligned error (PAE) matrix.
 
 {\centering\includegraphics[width=\linewidth]{poster_ipsae}\par}
 \figcaption{704 designed binders, holding out a whole target. Detection on the left, affinity on the right.}
@@ -136,7 +136,7 @@ On targets it never saw, the derived rule scores above the published score and a
 
 \vspace{0.16in}
 \begin{derivation}
-\subhead{The theory it stated}
+\subhead{The stated theory}
 {\fontsize{30}{39}\selectfont
 Treat the bound complex as a harmonic well. Equipartition makes the interface stiffness the inverse square of its fluctuation, and a stiffer well is a deeper one. Dividing by the binder's own internal error removes the predictor, and the units with it. Association confines six rigid-body degrees of freedom, each worth half the thermal energy times the log of the stiffness.\par}
 {\fontsize{32}{40}\selectfont
