@@ -61,7 +61,8 @@ def save(fig, name):
 def ipsae_tests(D):
     """The three held-out questions, each comparing the published score, two fitted models and reasoning."""
     tests = D["ipsae"]["tests"]
-    fig, axes = plt.subplots(1, 3, figsize=(14.6, 5.9))
+    tests = tests[1:]
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 5.2))
     for ax, t in zip(axes, tests):
         auc = t["metric"] == "AUC"
         floor, base = t["floor"], 0.55 if auc else 0.0
@@ -295,50 +296,48 @@ def tabular(D):
     save(fig, "poster_tabular")
 
 def framework(D):
-    """The controlled comparison: identical splits, identical use of them, one swapped learner."""
+    """The controlled comparison, drawn for a full-width band."""
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(14.6, 6.6))
-    ax.set_xlim(0, 100); ax.set_ylim(0, 50); ax.axis("off")
+    fig, ax = plt.subplots(figsize=(30, 8.2))
+    ax.set_xlim(0, 100); ax.set_ylim(0, 52); ax.axis("off")
 
-    cols = [(21, 46, "Train split"), (48, 73, "Validation split"), (75, 99, "Test split")]
+    cols = [(16, 42, "Train split"), (45, 71, "Validation split"), (74, 99, "Test split")]
     for x0, x1, name in cols:
-        ax.text((x0 + x1) / 2, 46.5, name, ha="center", fontsize=20,
+        ax.text((x0 + x1) / 2, 47.5, name, ha="center", fontsize=32,
                 color="#202A35", fontweight="bold")
 
     def row(y0, y1, label, cells, fc, ec, tc):
-        ax.text(1, (y0 + y1) / 2, label, ha="left", va="center", fontsize=20,
+        ax.text(0.5, (y0 + y1) / 2, label, ha="left", va="center", fontsize=31,
                 color=tc, fontweight="bold")
         for (x0, x1, _), text in zip(cols, cells):
             ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0,
                                         boxstyle="round,pad=0,rounding_size=1.3",
-                                        facecolor=fc, edgecolor=ec, linewidth=2.0, zorder=3))
+                                        facecolor=fc, edgecolor=ec, linewidth=3.0, zorder=3))
             ax.text((x0 + x1) / 2, (y0 + y1) / 2, text, ha="center", va="center",
-                    fontsize=17, color=tc, zorder=4, linespacing=1.4)
+                    fontsize=27, color=tc, zorder=4, linespacing=1.45)
         for a, b in zip(cols, cols[1:]):
-            ax.add_patch(FancyArrowPatch((a[1] + 0.3, (y0 + y1) / 2), (b[0] - 0.3, (y0 + y1) / 2),
-                                         arrowstyle="-|>", mutation_scale=22,
-                                         linewidth=2.0, color=ec, zorder=2))
+            ax.add_patch(FancyArrowPatch((a[1] + 0.4, (y0 + y1) / 2), (b[0] - 0.4, (y0 + y1) / 2),
+                                         arrowstyle="-|>", mutation_scale=34,
+                                         linewidth=3.0, color=ec, zorder=2))
 
-    row(27, 41, "Deep learning",
+    row(26, 43, "Deep learning",
         ["Fit parameters\nby gradient descent",
          "Tune and select\nthe checkpoint",
          "Score once,\nfrozen"],
         "#f4f4f4", GREY, "#555")
 
-    row(5, 19, "This work",
-        ["Read the data, state\na theory, write it as code",
-         "Run the program, read\nits errors, revise the theory",
+    row(2, 19, "This work",
+        ["Read the data, state a\ntheory, write it as code",
+         "Run the program, read its\nerrors, revise the theory",
          "Score once,\nfrozen"],
         "#EDF3F8", YALE, YALE)
 
-    # the revision loop inside the validation stage
-    ax.add_patch(FancyArrowPatch((67, 19.4), (54, 19.4), arrowstyle="-|>", mutation_scale=20,
-                                 linewidth=2.0, color=YALE, zorder=5,
-                                 connectionstyle="arc3,rad=0.55"))
-    ax.text(60.5, 24.0, "repeat", ha="center", fontsize=16, color=YALE)
-
+    ax.add_patch(FancyArrowPatch((64, 19.5), (52, 19.5), arrowstyle="-|>", mutation_scale=30,
+                                 linewidth=3.0, color=YALE, zorder=5,
+                                 connectionstyle="arc3,rad=0.42"))
+    ax.text(58, 23.4, "repeat", ha="center", fontsize=26, color=YALE)
     fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
 
