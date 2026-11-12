@@ -182,7 +182,7 @@ def digits(D):
     """How much training data the theory needed, and what trained models get."""
     R = D["digits"]["regimes"]
     refs = {r["label"]: r["accuracy"] for r in D["digits"]["references"]}
-    fig, axes = plt.subplots(1, 2, figsize=(14.6, 6.4),
+    fig, axes = plt.subplots(1, 2, figsize=(14.6, 7.2),
                              gridspec_kw={"width_ratios": [2.15, 1]})
 
     ax = axes[0]
@@ -292,51 +292,48 @@ def tabular(D):
     save(fig, "poster_tabular")
 
 def framework(D):
-    """Vertical: the two learners side by side, the three splits stacked."""
+    """Horizontal: three splits across, two learners down, set large."""
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
     YALE, GREY = "#00356B", "#8c8c8c"
-    fig, ax = plt.subplots(figsize=(14.6, 10.6))
-    ax.set_xlim(0, 100); ax.set_ylim(13, 100); ax.axis("off")
+    fig, ax = plt.subplots(figsize=(14.6, 9.6))
+    ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
 
-    lanes = [(21, 55, "Deep learning", "#f4f4f4", GREY, "#555"),
-             (59, 93, "This work", "#EDF3F8", YALE, YALE)]
-    rows = [(73, 92, "Train"), (43, 62, "Validation"), (16, 32, "Test")]
+    cols = [(16, 42, "Train split"), (44, 70, "Validation split"), (72, 98, "Test split")]
+    for x0, x1, name in cols:
+        ax.text((x0 + x1) / 2, 92, name, ha="center", fontsize=30,
+                color="#202A35", fontweight="bold")
 
-    cells = {
-        ("Deep learning", "Train"): "Fit parameters\nby gradient descent",
-        ("Deep learning", "Validation"): "Tune and select\nthe checkpoint",
-        ("Deep learning", "Test"): "Score once,\nfrozen",
-        ("This work", "Train"): "Read the data, state a\ntheory, write it as code",
-        ("This work", "Validation"): "Run the program, read\nits errors, revise\nthe theory",
-        ("This work", "Test"): "Score once,\nfrozen",
-    }
-
-    for x0, x1, name, fc, ec, tc in lanes:
-        ax.text((x0 + x1) / 2, 96, name, ha="center", fontsize=25,
-                color=tc, fontweight="bold")
-        for y0, y1, rname in rows:
+    def row(y0, y1, label, cells, fc, ec, tc):
+        ax.text(0, (y0 + y1) / 2, label, ha="left", va="center", fontsize=29,
+                color=tc, fontweight="bold", linespacing=1.3)
+        for (x0, x1, _), text in zip(cols, cells):
             ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0,
-                                        boxstyle="round,pad=0,rounding_size=1.6",
-                                        facecolor=fc, edgecolor=ec, linewidth=2.4, zorder=3))
-            ax.text((x0 + x1) / 2, (y0 + y1) / 2, cells[(name, rname)], ha="center",
-                    va="center", fontsize=20, color=tc, zorder=4, linespacing=1.4)
-        for (ya0, _, _), (_, yb1, _) in zip(rows, rows[1:]):
-            ax.add_patch(FancyArrowPatch(((x0 + x1) / 2, ya0 - 0.6), ((x0 + x1) / 2, yb1 + 0.6),
-                                         arrowstyle="-|>", mutation_scale=26,
-                                         linewidth=2.4, color=ec, zorder=2))
+                                        boxstyle="round,pad=0,rounding_size=1.8",
+                                        facecolor=fc, edgecolor=ec, linewidth=3.0, zorder=3))
+            ax.text((x0 + x1) / 2, (y0 + y1) / 2, text, ha="center", va="center",
+                    fontsize=24, color=tc, zorder=4, linespacing=1.45)
+        for a, b in zip(cols, cols[1:]):
+            ax.add_patch(FancyArrowPatch((a[1] + 0.6, (y0 + y1) / 2), (b[0] - 0.6, (y0 + y1) / 2),
+                                         arrowstyle="-|>", mutation_scale=34,
+                                         linewidth=3.0, color=ec, zorder=2))
 
-    for y0, y1, rname in rows:
-        ax.text(17, (y0 + y1) / 2, rname + "\nsplit", ha="right", va="center",
-                fontsize=23, color="#202A35", fontweight="bold", linespacing=1.35)
+    row(50, 84, "Deep\nlearning",
+        ["Fit parameters\nby gradient\ndescent",
+         "Tune and select\nthe checkpoint",
+         "Score once,\nfrozen"],
+        "#f4f4f4", GREY, "#555")
 
-    # revision loop beside the reasoning validation cell
-    ax.add_patch(FancyArrowPatch((94.4, 48), (94.4, 58), arrowstyle="-|>", mutation_scale=24,
-                                 linewidth=2.4, color=YALE, zorder=5,
-                                 connectionstyle="arc3,rad=-1.6"))
-    ax.text(99.6, 52.5, "repeat", ha="right", va="center", fontsize=20, color=YALE,
-            rotation=270)
+    row(6, 40, "This\nwork",
+        ["State a theory,\nwrite it as code",
+         "Read the errors,\nrevise the theory",
+         "Score once,\nfrozen"],
+        "#EDF3F8", YALE, YALE)
 
+    ax.add_patch(FancyArrowPatch((63, 40.6), (51, 40.6), arrowstyle="-|>", mutation_scale=32,
+                                 linewidth=3.0, color=YALE, zorder=5,
+                                 connectionstyle="arc3,rad=0.45"))
+    ax.text(57, 47.6, "repeat", ha="center", fontsize=26, color=YALE)
     fig.tight_layout(pad=0.1)
     save(fig, "poster_framework")
 
