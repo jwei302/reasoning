@@ -197,20 +197,20 @@ def digits(D):
     ax.set_xticks(range(len(groups)))
     ax.set_xticklabels([n for _, n in groups], fontsize=19)
     ax.set_xlabel("Number of training images", labelpad=10)
-    ax.set_title("Accuracy of a written theory")
+    ax.set_title("Reasoning through code")
     ax.set_xlim(-0.52, 2.78)
     ax.legend(loc="lower left", frameon=True, framealpha=0.96, fontsize=16)
 
     ax = axes[1]
     ys = [max(R["weights"][f].values()) for f in ("Astra", "Opus")]
-    ax.bar([0, 1], ys, width=0.46, color=[ASTRA, OPUS], edgecolor="white", linewidth=1.2, zorder=3)
-    for x, y, c in zip([0, 1], ys, [ASTRA, OPUS]):
+    ax.bar([0, 0.72], ys, width=0.42, color=[ASTRA, OPUS], edgecolor="white", linewidth=1.2, zorder=3)
+    for x, y, c in zip([0, 0.72], ys, [ASTRA, OPUS]):
         ax.text(x, y + 0.7, f"{y:.0f}", ha="center", va="bottom", fontsize=19,
                 fontweight="bold", color=c, zorder=4)
-    ax.set_xticks([0, 1]); ax.set_xticklabels(["Astra", "Opus"], fontsize=19)
+    ax.set_xticks([0, 0.72]); ax.set_xticklabels(["Astra", "Opus"], fontsize=19)
     ax.set_xlabel("No optimizer", labelpad=10)
-    ax.set_title("Every weight written by hand")
-    ax.set_xlim(-0.62, 1.62)
+    ax.set_title("Reasoning through weights")
+    ax.set_xlim(-0.42, 1.80)
 
     for ax in axes:
         for label, name in [("linear classifier on pixels", "linear"),
