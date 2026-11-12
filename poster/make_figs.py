@@ -245,7 +245,7 @@ def powerlaw(D):
     ax.set_xticks(range(1, 6)); ax.set_xticklabels(EFFORTS)
     ax.set_yticks([0.8, 1, 1.5, 2]); ax.set_yticklabels(["0.8", "1.0", "1.5", "2.0"])
     ax.minorticks_off()
-    ax.set_xlabel("Effort that wrote the starting weights")
+    ax.set_xlabel("Reasoning effort")
     ax.set_ylabel("Held-out error after training (%)")
     pass
     ax.legend(loc="lower left", frameon=True, framealpha=0.95, fontsize=15)
